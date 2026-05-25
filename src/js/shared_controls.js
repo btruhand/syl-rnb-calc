@@ -1868,7 +1868,9 @@ $(document).on('click', '.right-side', function () {
 			calcStats(pokeObj);
 		}
 		var trainerName = set.substring(set.indexOf("(") + 1, set.lastIndexOf(")"));
-		var baseAbility = (MEGA_BASE_ABILITIES[trainerName] && MEGA_BASE_ABILITIES[trainerName][baseName])
+		if (trainerName.includes("Trainer Rival")) { trainerName = "Pokemon Trainer May"; }
+		var mbaKey = Object.keys(MEGA_BASE_ABILITIES).find(k => trainerName.includes(k)) || trainerName;
+		var baseAbility = (MEGA_BASE_ABILITIES[mbaKey] && MEGA_BASE_ABILITIES[mbaKey][baseName])
 			|| (basePokemon && basePokemon.ab)
 			|| "";
 		pokeObj.find(".ability").val(baseAbility).keyup();
