@@ -669,7 +669,7 @@ select.toxic-counter {
 }
 .poke-info .crit-btn {
     font-size: 0.8em;
-    width: 5em;
+    width: 2.5em;
     height: 1em;
     padding: 3px 3px;
     margin: 0px 1px;
@@ -685,6 +685,16 @@ select.toxic-counter {
 
 .small-crit-btn[id*="TopL"] {
     margin-left: 0.8em;
+}
+
+.crit-rate {
+    display: inline-block;
+    min-width: 2.7em;
+    font-size: 0.75em;
+    color: inherit;
+    opacity: 0.75;
+    vertical-align: middle;
+    margin-left: 2px;
 }
 
 /* field info */
