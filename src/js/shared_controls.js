@@ -594,6 +594,9 @@ $(".set-selector").change(function () {
 	}
 
 	$('.trainer-pok-list-opposing').html(trpok_html);
+	if ($(this).hasClass('opposing')){
+		colorCodeUpdateOpposing();
+	}
 	var setIndex = $(this).prop('title');
 	var pokemonName = fullSetName.substring(0, fullSetName.indexOf(" ("));
 	var setName = fullSetName.substring(fullSetName.indexOf("(") + 1, fullSetName.lastIndexOf(")"));
@@ -1883,6 +1886,7 @@ $(document).on('click', '.left-side', function () {
 	$('.player').val(set);
 	$('.player').change();
 	$('.player .select2-chosen').text(set);
+	colorCodeUpdateOpposing();
 })
 
 $(document).on('change', '#p2 .i-f-o-move select.move-selector', function () {
@@ -1979,10 +1983,41 @@ function colorCodeUpdate(){
 		else if (ohkoCheck){
 			pMons[i].className = `trainer-pok left-side mon-dmg-${idColor.code}`;
 		}
-		
-		
+	}
+	colorCodeUpdateOpposing();
+}
+
+function colorCodeUpdateOpposing(){
+	var speCheck = document.getElementById("cc-spe-border").checked;
+	var ohkoCheck = document.getElementById("cc-ohko-color").checked;
+	var oppCheck = document.getElementById("cc-opp-color").checked;
+	if (!oppCheck || (!speCheck && !ohkoCheck)){
+		return;
+	}
+	var oppMons = document.getElementsByClassName("trainer-pok right-side");
+	if (oppMons.length === 0) return;
+	// Pre-create player pokemon from form once (works for custom sets too).
+	// Pass as p2 so each opposing mon is p1 — this gives colors/speed from the
+	// opposing mon's perspective: speed "F" = opposing is faster (cyan), code "4"
+	// = player OHKOs the opposing mon (red = it's in danger), matching player-side
+	// semantics where red = the pokemon with the border is in danger.
+	var playerPok = createPokemon($("#p1"));
+	for (let i = 0; i < oppMons.length; i++) {
+		let set = oppMons[i].getAttribute("data-id");
+		if (!set) continue;
+		let idColor = calculationsColors(set, playerPok);
+		if (speCheck && ohkoCheck){
+			oppMons[i].className = `trainer-pok right-side mon-speed-${idColor.speed} mon-dmg-${idColor.code}`;
+		}
+		else if (speCheck){
+			oppMons[i].className = `trainer-pok right-side mon-speed-${idColor.speed}`;
+		}
+		else if (ohkoCheck){
+			oppMons[i].className = `trainer-pok right-side mon-dmg-${idColor.code}`;
+		}
 	}
 }
+
 function showColorCodes(){
 	colorCodeUpdate();
 	HideShowCCSettings();
@@ -1996,6 +2031,10 @@ function hideColorCodes(){
 	var pMons = document.getElementsByClassName("trainer-pok left-side");
 	for (let i = 0; i < pMons.length; i++) {
 		pMons[i].className = "trainer-pok left-side";
+	}
+	var oppMons = document.getElementsByClassName("trainer-pok right-side");
+	for (let i = 0; i < oppMons.length; i++) {
+		oppMons[i].className = "trainer-pok right-side";
 	}
 	document.getElementById("cc-auto-refr").checked = false;
 	HideShowCCSettings();
@@ -2084,6 +2123,18 @@ function SpeedBorderSetsChange(ev){
 			monImg.classList.add("mon-speed-none")
 		}
 	}
+	if (document.getElementById("cc-opp-color").checked){
+		var oppImgs = document.getElementsByClassName("right-side");
+		if (ev.target.checked){
+			for (let monImg of oppImgs){
+				monImg.classList.remove("mon-speed-none")
+			}
+		}else{
+			for (let monImg of oppImgs){
+				monImg.classList.add("mon-speed-none")
+			}
+		}
+	}
 }
 
 function ColorCodeSetsChange(ev){
@@ -2095,6 +2146,29 @@ function ColorCodeSetsChange(ev){
 	}else{
 		for (let monImg of monImgs){
 			monImg.classList.add("mon-dmg-none")
+		}
+	}
+	if (document.getElementById("cc-opp-color").checked){
+		var oppImgs = document.getElementsByClassName("right-side");
+		if (ev.target.checked){
+			for (let monImg of oppImgs){
+				monImg.classList.remove("mon-dmg-none")
+			}
+		}else{
+			for (let monImg of oppImgs){
+				monImg.classList.add("mon-dmg-none")
+			}
+		}
+	}
+}
+
+function OppColorSetsChange(ev){
+	if (ev.target.checked){
+		colorCodeUpdateOpposing();
+	}else{
+		var oppMons = document.getElementsByClassName("trainer-pok right-side");
+		for (let mon of oppMons){
+			mon.className = "trainer-pok right-side";
 		}
 	}
 }
@@ -2291,8 +2365,10 @@ $(document).ready(function () {
 	$('#trash-pok').click(TrashPokemon);
 	$('#cc-spe-border').change(SpeedBorderSetsChange);
 	$('#cc-ohko-color').change(ColorCodeSetsChange);
+	$('#cc-opp-color').change(OppColorSetsChange);
 	$('#cc-spe-border')[0].checked=true;
 	$('#cc-ohko-color')[0].checked=true;
+	$('#cc-opp-color')[0].checked=false;
 	$('#singles-format').click(updateSingleDoublesIcon);
 	$('#doubles-format').click(updateSingleDoublesIcon);
 	for (let dropzone of document.getElementsByClassName("dropzone")) {
