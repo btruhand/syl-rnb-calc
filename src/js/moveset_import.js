@@ -282,6 +282,26 @@ function getMoves(currentPoke, rows, offset) {
 	return currentPoke;
 }
 
+function getMegaFormsForBase(baseName) {
+	var result = [];
+	for (var stone in calc.MEGA_STONES) {
+		if (calc.MEGA_STONES[stone] === baseName) {
+			var formName;
+			if (stone.slice(-2) === ' X') {
+				formName = baseName + '-Mega-X';
+			} else if (stone.slice(-2) === ' Y') {
+				formName = baseName + '-Mega-Y';
+			} else {
+				formName = baseName + '-Mega';
+			}
+			var megaSpecies = calc.SPECIES[9][formName];
+			var ability = megaSpecies ? megaSpecies.abilities[0] : undefined;
+			result.push({ formName: formName, stone: stone, ability: ability });
+		}
+	}
+	return result;
+}
+
 function addToDex(poke) {
 	var dexObject = {};
 	if ($("#randoms").prop("checked")) {
@@ -333,6 +353,21 @@ function addToDex(poke) {
 			customsets["Aegislash-Shield"] = {};
 		}
 		customsets["Aegislash-Shield"][poke.nameProp] = dexObject;
+	}
+	var megaForms = getMegaFormsForBase(poke.name);
+	for (var m = 0; m < megaForms.length; m++) {
+		var megaInfo = megaForms[m];
+		if (customsets[megaInfo.formName]) {
+			for (var megaSetName in customsets[megaInfo.formName]) {
+				customsets[megaInfo.formName][megaSetName].level = dexObject.level;
+				customsets[megaInfo.formName][megaSetName].nature = dexObject.nature;
+				customsets[megaInfo.formName][megaSetName].ivs = dexObject.ivs;
+				customsets[megaInfo.formName][megaSetName].item = megaInfo.stone;
+				if (megaInfo.ability) {
+					customsets[megaInfo.formName][megaSetName].ability = megaInfo.ability;
+				}
+			}
+		}
 	}
 	updateDex(customsets);
 }
