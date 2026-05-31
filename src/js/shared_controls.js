@@ -246,7 +246,6 @@ $(".ability").bind("keyup change", function () {
 	} else {
 		$(this).closest(".poke-info").find(".alliesFainted").val('0');
 		$(this).closest(".poke-info").find(".alliesFainted").hide();
-
 	}
 });
 
@@ -370,69 +369,6 @@ $(".status").bind("keyup change", function () {
 
 var lockerMove = "";
 
-var guaranteedCritHighRatioMoves = [
-	"Aeroblast", "Air Cutter", "Attack Order",
-	"Blaze Kick", "Crabhammer", "Cross Chop", "Cross Poison", "Drill Run",
-	"Karate Chop", "Leaf Blade", "Night Slash", "Poison Tail", "Psycho Cut",
-	"Razor Leaf", "Razor Wind", "Shadow Claw", "Sky Attack", "Slash",
-	"Spacial Rend", "Stone Edge"
-];
-var guaranteedCritItems = ["Razor Claw", "Scope Lens"];
-var critBlockingAbilities = ["Battle Armor", "Shell Armor", "Magma Armor"];
-
-function matchesAny(value, values) {
-	return values.indexOf(value) !== -1;
-}
-
-function getOpposingPokeInfo(pokeInfo) {
-	return pokeInfo.attr("id") === "p1" ? $("#p2") : $("#p1");
-}
-
-function getMoveCritRate(move, moveGroupObj) {
-	var attacker = moveGroupObj.closest(".poke-info");
-	var defender = getOpposingPokeInfo(attacker);
-	var attackerSide = attacker.attr("id") === "p1" ? "L" : "R";
-	var moveName = move.name || moveGroupObj.children(".move-selector").val();
-	var defenderAbility = defender.find(".ability").val();
-	if (move.category === "Status" || moveName === "(No Move)") return null;
-	if (matchesAny(defenderAbility, autoCritBlockingAbilities)) return 0;
-	if (move.willCrit === true) return 1;
-
-	var ability = attacker.find(".ability").val();
-	var item = attacker.find(".item").val();
-	var species = attacker.find(".set-selector").val() || "";
-	var boosts = 0;
-	var stages = [0.0625, 0.125, 0.5, 1];
-
-	if (matchesAny(moveName, guaranteedCritHighRatioMoves)) boosts++;
-	if (matchesAny(item, guaranteedCritItems)) boosts++;
-	if (ability === "Super Luck") boosts++;
-	if (species.includes("fetch'd") && (item === "Leek" || item === "Stick")) boosts += 2;
-	if (species.indexOf("Chansey") === 0 && item === "Lucky Punch") boosts += 2;
-	if ($("#focusEnergy" + attackerSide).prop("checked")) boosts += 2;
-
-	return stages[Math.min(boosts, stages.length - 1)];
-}
-
-function getPokemonMoveCritRate(attacker, defender, field, move) {
-	var moveName = move.name || move.originalName;
-	if (move.category === "Status" || moveName === "(No Move)" || !move.bp) return null;
-	if (defender.hasAbility && defender.hasAbility("Battle Armor", "Shell Armor", "Magma Armor")) return 0;
-	if (move.isCrit) return 1;
-
-	var boosts = 0;
-	var stages = [0.0625, 0.125, 0.5, 1];
-
-	if (matchesAny(moveName, guaranteedCritHighRatioMoves)) boosts++;
-	if (matchesAny(attacker.item, guaranteedCritItems)) boosts++;
-	if (attacker.hasAbility && attacker.hasAbility("Super Luck")) boosts++;
-	if (attacker.name.includes("fetch'd") && (attacker.item === "Leek" || attacker.item === "Stick")) boosts += 2;
-	if (attacker.name === "Chansey" && attacker.item === "Lucky Punch") boosts += 2;
-	if (field && field.attackerSide && field.attackerSide.isFocusEnergy) boosts += 2;
-
-	return stages[Math.min(boosts, stages.length - 1)];
-}
-
 function formatCritRate(rate) {
 	if (rate === null) return "";
 	var percent = rate * 100;
@@ -453,9 +389,10 @@ function updateCritRateLabelById(idSuffix, rate) {
 }
 
 function updateCritRateLabelsFromPokemon(p1, p2, p1field, p2field) {
+	console.log(p1, p2, p1field, p2field);
 	for (var i = 0; i < 4; i++) {
-		updateCritRateLabelById("L" + (i + 1), getPokemonMoveCritRate(p1, p2, p1field, p1.moves[i]));
-		updateCritRateLabelById("R" + (i + 1), getPokemonMoveCritRate(p2, p1, p2field, p2.moves[i]));
+		updateCritRateLabelById("L" + (i + 1), getCritRate(p1, p2, p1field, p1.moves[i]));
+		updateCritRateLabelById("R" + (i + 1), getCritRate(p2, p1, p2field, p2.moves[i]));
 	}
 }
 
@@ -469,7 +406,8 @@ function updateGuaranteedCritForMove(moveGroupObj, clearNonGuaranteed) {
 	var moveName = moveGroupObj.children(".move-selector").val();
 	var move = moves[moveName] || moves['(No Move)'];
 	var crit = moveGroupObj.children(".move-crit");
-	var critRate = getMoveCritRate(move, moveGroupObj);
+	// change to new
+	var critRate = getCritRate(move, moveGroupObj);
 	updateCritRateLabel(moveGroupObj, critRate);
 
 	if (critRate === 1) {

@@ -64,7 +64,7 @@ const statusApplyingMoves: string[] = [
 ];
 const defrostingMoves: string[] = [
     "Burn Up", "Flame Wheel", "Flare Blitz", "Fusion Flare", "Pyro Ball", "Sacred Fire", "Scald", "Scorching Sands", "Steam Eruption"
-]
+];
 
 // move functions
 function isNamed(moveName: string, ...names: string[]) {
