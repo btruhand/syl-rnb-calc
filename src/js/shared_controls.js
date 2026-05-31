@@ -395,7 +395,7 @@ function getMoveCritRate(move, moveGroupObj) {
 	var moveName = move.name || moveGroupObj.children(".move-selector").val();
 	var defenderAbility = defender.find(".ability").val();
 	if (move.category === "Status" || moveName === "(No Move)") return null;
-	if (matchesAny(defenderAbility, autoCritBlockingAbilities)) return 0;
+	if (matchesAny(defenderAbility, critBlockingAbilities)) return 0;
 	if (move.willCrit === true) return 1;
 
 	var ability = attacker.find(".ability").val();
