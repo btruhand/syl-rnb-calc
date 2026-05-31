@@ -1,3 +1,5 @@
+var getCritRate = window.getCritRate;
+
 var zeroBPButNotStatus = ["Electro Ball", "Metal Burst", "Endeavor", "Bide",
      "Seismic Toss", "Punishment", "Flail", "Reversal", "Gyro Ball", "Magnitude", "Heat Crash",
       "Heavy Slam", "Present", "Natural Gift", "Beat Up", "Fissure", "Guillotine", "Horn Drill", "Super Fang",
@@ -369,16 +371,6 @@ $(".status").bind("keyup change", function () {
 
 var lockerMove = "";
 
-var guaranteedCritHighRatioMoves = [
-	"Aeroblast", "Air Cutter", "Attack Order",
-	"Blaze Kick", "Crabhammer", "Cross Chop", "Cross Poison", "Drill Run",
-	"Karate Chop", "Leaf Blade", "Night Slash", "Poison Tail", "Psycho Cut",
-	"Razor Leaf", "Razor Wind", "Shadow Claw", "Sky Attack", "Slash",
-	"Spacial Rend", "Stone Edge"
-];
-var guaranteedCritItems = ["Razor Claw", "Scope Lens"];
-var critBlockingAbilities = ["Battle Armor", "Shell Armor", "Magma Armor"];
-
 function matchesAny(value, values) {
 	return values.indexOf(value) !== -1;
 }
@@ -386,6 +378,16 @@ function matchesAny(value, values) {
 function getOpposingPokeInfo(pokeInfo) {
 	return pokeInfo.attr("id") === "p1" ? $("#p2") : $("#p1");
 }
+
+$(".crit-btn").click(function()) {
+	const idSuffix = this.id.substr(this.id.length - 2);
+	const critCheckbox = $("#crit" + idSuffix);
+	// TODO: cont from here, finish this, test edge cases, test range compare, update style, create ai setting for configurability
+	$("#critRate" + idSuffix)
+}
+
+// TODO: cont from here
+/*
 
 function getMoveCritRate(move, moveGroupObj) {
 	var attacker = moveGroupObj.closest(".poke-info");
@@ -430,7 +432,7 @@ function getPokemonMoveCritRate(attacker, defender, field, move) {
 	if (field && field.attackerSide && field.attackerSide.isFocusEnergy) boosts += 2;
 
 	return stages[Math.min(boosts, stages.length - 1)];
-}
+} */
 
 function formatCritRate(rate) {
 	if (rate === null) return "";
@@ -454,8 +456,8 @@ function updateCritRateLabelById(idSuffix, rate) {
 function updateCritRateLabelsFromPokemon(p1, p2, p1field, p2field) {
 	console.log(p1, p2, p1field, p2field);
 	for (var i = 0; i < 4; i++) {
-		updateCritRateLabelById("L" + (i + 1), getCritRate(p1, p2, p1field, p1.moves[i]));
-		updateCritRateLabelById("R" + (i + 1), getCritRate(p2, p1, p2field, p2.moves[i]));
+		updateCritRateLabelById("L" + (i + 1), getCritRate(p1, p2, p1field, p2field, i));
+		updateCritRateLabelById("R" + (i + 1), getCritRate(p2, p1, p2field, p1field, i));
 	}
 }
 
@@ -470,7 +472,8 @@ function updateGuaranteedCritForMove(moveGroupObj, clearNonGuaranteed) {
 	var move = moves[moveName] || moves['(No Move)'];
 	var crit = moveGroupObj.children(".move-crit");
 	// change to new
-	var critRate = getCritRate(move, moveGroupObj);
+	// var critRate = getCritRate(move, moveGroupObj);
+	var critRate = 0.0625;
 	updateCritRateLabel(moveGroupObj, critRate);
 
 	if (critRate === 1) {
