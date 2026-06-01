@@ -669,10 +669,14 @@ select.toxic-counter {
 }
 .poke-info .crit-btn {
     font-size: 0.8em;
-    width: 2.5em;
+    width: 5em;
     height: 1em;
     padding: 3px 3px;
     margin: 0px 1px;
+}
+
+body.show-crit-percentages .poke-info .crit-btn {
+    width: 2.5em;
 }
 
 .small-crit-btn {
@@ -688,12 +692,21 @@ select.toxic-counter {
 }
 
 .crit-rate {
-    display: inline-block;
-    min-width: 2.7em;
-    font-size: 0.75em;
+    display: inline;
+    white-space: nowrap;
+    font-size: 0.85em;
     color: inherit;
     vertical-align: middle;
-    margin-bottom: 4px;
+    margin-bottom: 3px;
+}
+
+.crit-rate-value,
+.crit-rate-sign {
+    display: inline;
+}
+
+.crit-rate-sign {
+    font-size: 0.7em;
 }
 
 /* field info */

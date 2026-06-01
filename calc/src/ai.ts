@@ -222,7 +222,7 @@ function getAIDeadAfterShellSmash(res: any[], playerMaxDamage: number) {
     return playerMaxDamageAfterSS >= aiCurrentHp;
 }
 
-function getMoveIsStatus(moveName: string, moveBp: number) {
+export function getMoveIsStatus(moveName: string, moveBp: number) {
     return moveBp <= 0 &&
         !isNamed(moveName, ...zeroBPButNotStatus)
 }

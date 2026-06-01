@@ -379,27 +379,44 @@ function getOpposingPokeInfo(pokeInfo) {
 	return pokeInfo.attr("id") === "p1" ? $("#p2") : $("#p1");
 }
 
-function formatCritRate(rate) {
+function formatCritRateValue(rate) {
 	if (rate === null) return "";
 	var percent = rate * 100;
-	return (percent % 1 === 0 ? percent.toFixed(0) : percent.toString()) + "%";
+	return percent % 1 === 0 ? percent.toFixed(0) : percent.toString();
+}
+
+function critRateLabelsVisible() {
+	var $toggle = $("#showCritPercentages");
+	return !$toggle.length || $toggle.is(":checked");
+}
+
+function critRateLabelHtml(labelId) {
+	return '<span class="crit-rate" id="' + labelId + '">' +
+		'<span class="crit-rate-value"></span><span class="crit-rate-sign">%</span></span>';
+}
+
+function ensureCritRateLabelStructure($label) {
+	if (!$label.find(".crit-rate-value").length) {
+		$label.html('<span class="crit-rate-value"></span><span class="crit-rate-sign">%</span>');
+	}
 }
 
 function updateCritRateLabel(moveGroupObj, rate) {
 	var idSuffix = moveGroupObj.children(".move-crit").attr("id").substr(4);
-	var text = formatCritRate(rate);
-	var hidden = text === "";
-	$("#critRate" + idSuffix).text(text).toggle(!hidden);
+	updateCritRateLabelById(idSuffix, rate);
 }
 
 function updateCritRateLabelById(idSuffix, rate) {
-	var text = formatCritRate(rate);
-	var hidden = text === "";
-	$("#critRate" + idSuffix).text(text).toggle(!hidden);
+	if (!critRateLabelsVisible()) return;
+	var $label = $("#critRate" + idSuffix);
+	if (!$label.length) return;
+	ensureCritRateLabelStructure($label);
+	var value = formatCritRateValue(rate);
+	$label.find(".crit-rate-value").text(value);
+	$label.toggle(value !== "");
 }
 
 function updateCritRateLabelsFromPokemon(p1, p2, p1field, p2field) {
-	console.log(p1, p2, p1field, p2field);
 	for (var i = 0; i < 4; i++) {
 		updateCritRateLabelById("L" + (i + 1), getCritRate(p1, p2, p1field, p2field, i));
 		updateCritRateLabelById("R" + (i + 1), getCritRate(p2, p1, p2field, p1field, i));
@@ -412,29 +429,13 @@ function setCritCheckbox(moveGroupObj, checked, autoCrit) {
 	crit.prop("checked", checked).change();
 }
 
-function updateGuaranteedCritForMove(moveGroupObj, clearNonGuaranteed) {
-	var moveName = moveGroupObj.children(".move-selector").val();
-	var move = moves[moveName] || moves['(No Move)'];
-	var crit = moveGroupObj.children(".move-crit");
-	// change to new
-	// var critRate = getCritRate(move, moveGroupObj);
-	var critRate = 0.0625;
-	updateCritRateLabel(moveGroupObj, critRate);
-
-	if (critRate === 1) {
-		setCritCheckbox(moveGroupObj, true, true);
-	} else if (clearNonGuaranteed || crit.data("autoCrit")) {
-		setCritCheckbox(moveGroupObj, false, false);
-	}
-}
-
 function ensureCritRateLabels(showCritPercentages) {
 	if (showCritPercentages) {
 		$(".move-crit").each(function () {
 			var idSuffix = this.id.substr(4);
 			var labelId = "critRate" + idSuffix;
 			if (!$("#" + labelId).length) {
-				$(this).next(".crit-btn").after('<span class="crit-rate" id="' + labelId + '"></span>');
+				$(this).next(".crit-btn").after(critRateLabelHtml(labelId));
 			}
 		});
 	} else {
@@ -442,21 +443,26 @@ function ensureCritRateLabels(showCritPercentages) {
 	}
 }
 
-function updateGuaranteedCrits() {
-	$(".i-f-move, .i-f-o-move").each(function () {
-		updateGuaranteedCritForMove($(this), false);
-	});
+function populateCritRateLabels() {
+	var p1info = $("#p1");
+	var p2info = $("#p2");
+	if (!p1info.length || !p2info.length) return;
+	var p1 = createPokemon(p1info);
+	var p2 = createPokemon(p2info);
+	var p1field = createField();
+	updateCritRateLabelsFromPokemon(p1, p2, p1field, p1field.clone().swap());
 }
 
 function refreshCritRateLabels() {
-	ensureCritRateLabels($("#showCritPercentages").is(":checked"));
+	var showCritPercentages = critRateLabelsVisible();
+	$("body").toggleClass("show-crit-percentages", showCritPercentages);
+	ensureCritRateLabels(showCritPercentages);
+	if (showCritPercentages) {
+		populateCritRateLabels();
+	}
 }
 
-$("#showCritPercentages").change(function() {
-	var showCritPercentages = $(this).is(":checked");
-	console.log("showCritPercentages", showCritPercentages);
-	ensureCritRateLabels(showCritPercentages);
-});
+$(document).on("change", "#showCritPercentages", refreshCritRateLabels);
 
 // auto-update move details on select
 $(".move-selector").change(function () {

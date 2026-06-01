@@ -22,27 +22,30 @@ function strMatch(s, ...matches) {
 	return match;
 }
 
+// TODO: one field probably works with some refactoring
 function getCritRate(attacker, defender, aField, dField, moveIndex, honorCritFlag = true) {
-    console.log(attacker, defender, aField, dField, moveIndex);
-	if (strMatch(defender.ability, ...critBlockingAbilities) ||
-		(dField.isLuckyChant ?? false)) { return 0; }
+	console.log(attacker, defender, aField, dField, moveIndex); // DEBUG
+	const move = attacker.moves[moveIndex];
+	const moveName = move.name;
+	const attackerNotInitialized = attacker.item === null || attacker.ability === null || attacker.name === null;
+	const critBlocking = strMatch(defender.ability, ...critBlockingAbilities) || (dField.isLuckyChant ?? false);
 
-	if (attacker.moves[moveIndex].isCrit && honorCritFlag) { return 1; }
+	if (attackerNotInitialized || critBlocking || calc.getMoveIsStatus(moveName, move.bp)) { return 0; }
+	if (move.isCrit && honorCritFlag) { return 1; }
 
 	stages = [0.0625, 0.125, 0.5, 1];
 
 	boosts = 0;
 
-	if (strMatch(attacker.moves[moveIndex].originalName, ...highCritRatioMoveNames)) {
+	if (strMatch(move.originalName, ...highCritRatioMoveNames)) {
 		boosts++;
 	}
 
 	if (strMatch(attacker.item, ...highCritRatioItems)) { boosts++; }
 	if (strMatch(attacker.ability, "Super Luck")) { boosts++; }
-	if (attacker.name.includes("fetch'd") && 
-		(attacker.item == "Leek" || attacker.item == "Stick")) { boosts += 2; }
+	if (attacker.name.includes("fetch'd") && (attacker.item == "Leek" || attacker.item == "Stick")) { boosts += 2; }
 	if (attacker.name == "Chansey" && attacker.item == "Lucky Punch") { boosts += 2; }
-	if (aField.isFocusEnergy) { boosts += 2; }
+	if (aField.attackerSide.isFocusEnergy) { boosts += 2; }
 
 	boosts = Math.min(boosts, stages.length-1);
 	
