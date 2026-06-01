@@ -692,9 +692,8 @@ select.toxic-counter {
     min-width: 2.7em;
     font-size: 0.75em;
     color: inherit;
-    opacity: 0.75;
     vertical-align: middle;
-    margin-left: 2px;
+    margin-bottom: 4px;
 }
 
 /* field info */

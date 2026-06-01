@@ -22,10 +22,12 @@ function strMatch(s, ...matches) {
 	return match;
 }
 
-function getCritRate(attacker, defender, aField, dField, moveIndex) {
+function getCritRate(attacker, defender, aField, dField, moveIndex, honorCritFlag = true) {
     console.log(attacker, defender, aField, dField, moveIndex);
 	if (strMatch(defender.ability, ...critBlockingAbilities) ||
 		(dField.isLuckyChant ?? false)) { return 0; }
+
+	if (attacker.moves[moveIndex].isCrit && honorCritFlag) { return 1; }
 
 	stages = [0.0625, 0.125, 0.5, 1];
 

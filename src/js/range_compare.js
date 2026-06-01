@@ -480,7 +480,6 @@ function recalcEntry(entry) {
 		
 		entry.damageRolls = rolls;
 		entry.critRolls = critRolls;
-		console.log(attacker, defender, field, p2field, entry.moveIdx);
 		entry.critRate = getCritRate(attacker, defender, field, p2field, entry.moveIdx);
 		
 		entry.damageRollsStr = entry.damageRolls.join(', ');

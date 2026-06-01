@@ -379,61 +379,6 @@ function getOpposingPokeInfo(pokeInfo) {
 	return pokeInfo.attr("id") === "p1" ? $("#p2") : $("#p1");
 }
 
-$(".crit-btn").click(function()) {
-	const idSuffix = this.id.substr(this.id.length - 2);
-	const critCheckbox = $("#crit" + idSuffix);
-	// TODO: cont from here, finish this, test edge cases, test range compare, update style, create ai setting for configurability
-	$("#critRate" + idSuffix)
-}
-
-// TODO: cont from here
-/*
-
-function getMoveCritRate(move, moveGroupObj) {
-	var attacker = moveGroupObj.closest(".poke-info");
-	var defender = getOpposingPokeInfo(attacker);
-	var attackerSide = attacker.attr("id") === "p1" ? "L" : "R";
-	var moveName = move.name || moveGroupObj.children(".move-selector").val();
-	var defenderAbility = defender.find(".ability").val();
-	if (move.category === "Status" || moveName === "(No Move)") return null;
-	if (matchesAny(defenderAbility, autoCritBlockingAbilities)) return 0;
-	if (move.willCrit === true) return 1;
-
-	var ability = attacker.find(".ability").val();
-	var item = attacker.find(".item").val();
-	var species = attacker.find(".set-selector").val() || "";
-	var boosts = 0;
-	var stages = [0.0625, 0.125, 0.5, 1];
-
-	if (matchesAny(moveName, guaranteedCritHighRatioMoves)) boosts++;
-	if (matchesAny(item, guaranteedCritItems)) boosts++;
-	if (ability === "Super Luck") boosts++;
-	if (species.includes("fetch'd") && (item === "Leek" || item === "Stick")) boosts += 2;
-	if (species.indexOf("Chansey") === 0 && item === "Lucky Punch") boosts += 2;
-	if ($("#focusEnergy" + attackerSide).prop("checked")) boosts += 2;
-
-	return stages[Math.min(boosts, stages.length - 1)];
-}
-
-function getPokemonMoveCritRate(attacker, defender, field, move) {
-	var moveName = move.name || move.originalName;
-	if (move.category === "Status" || moveName === "(No Move)" || !move.bp) return null;
-	if (defender.hasAbility && defender.hasAbility("Battle Armor", "Shell Armor", "Magma Armor")) return 0;
-	if (move.isCrit) return 1;
-
-	var boosts = 0;
-	var stages = [0.0625, 0.125, 0.5, 1];
-
-	if (matchesAny(moveName, guaranteedCritHighRatioMoves)) boosts++;
-	if (matchesAny(attacker.item, guaranteedCritItems)) boosts++;
-	if (attacker.hasAbility && attacker.hasAbility("Super Luck")) boosts++;
-	if (attacker.name.includes("fetch'd") && (attacker.item === "Leek" || attacker.item === "Stick")) boosts += 2;
-	if (attacker.name === "Chansey" && attacker.item === "Lucky Punch") boosts += 2;
-	if (field && field.attackerSide && field.attackerSide.isFocusEnergy) boosts += 2;
-
-	return stages[Math.min(boosts, stages.length - 1)];
-} */
-
 function formatCritRate(rate) {
 	if (rate === null) return "";
 	var percent = rate * 100;
@@ -483,14 +428,18 @@ function updateGuaranteedCritForMove(moveGroupObj, clearNonGuaranteed) {
 	}
 }
 
-function ensureCritRateLabels() {
-	$(".move-crit").each(function () {
-		var idSuffix = this.id.substr(4);
-		var labelId = "critRate" + idSuffix;
-		if (!$("#" + labelId).length) {
-			$(this).next(".crit-btn").after('<span class="crit-rate" id="' + labelId + '"></span>');
-		}
-	});
+function ensureCritRateLabels(showCritPercentages) {
+	if (showCritPercentages) {
+		$(".move-crit").each(function () {
+			var idSuffix = this.id.substr(4);
+			var labelId = "critRate" + idSuffix;
+			if (!$("#" + labelId).length) {
+				$(this).next(".crit-btn").after('<span class="crit-rate" id="' + labelId + '"></span>');
+			}
+		});
+	} else {
+		$(".crit-rate").remove();
+	}
 }
 
 function updateGuaranteedCrits() {
@@ -500,9 +449,14 @@ function updateGuaranteedCrits() {
 }
 
 function refreshCritRateLabels() {
-	ensureCritRateLabels();
-	updateGuaranteedCrits();
+	ensureCritRateLabels($("#showCritPercentages").is(":checked"));
 }
+
+$("#showCritPercentages").change(function() {
+	var showCritPercentages = $(this).is(":checked");
+	console.log("showCritPercentages", showCritPercentages);
+	ensureCritRateLabels(showCritPercentages);
+});
 
 // auto-update move details on select
 $(".move-selector").change(function () {
