@@ -64,7 +64,7 @@ const statusApplyingMoves: string[] = [
 ];
 const defrostingMoves: string[] = [
     "Burn Up", "Flame Wheel", "Flare Blitz", "Fusion Flare", "Pyro Ball", "Sacred Fire", "Scald", "Scorching Sands", "Steam Eruption"
-]
+];
 
 // move functions
 function isNamed(moveName: string, ...names: string[]) {
@@ -222,7 +222,7 @@ function getAIDeadAfterShellSmash(res: any[], playerMaxDamage: number) {
     return playerMaxDamageAfterSS >= aiCurrentHp;
 }
 
-function getMoveIsStatus(moveName: string, moveBp: number) {
+export function getMoveIsStatus(moveName: string, moveBp: number) {
     return moveBp <= 0 &&
         !isNamed(moveName, ...zeroBPButNotStatus)
 }
