@@ -1986,7 +1986,29 @@ function colorCodeUpdate(){
 		}
 	}
 	damageResults = savedDamageResults;
+	colorCodeUpdatePlayerTop();
 	colorCodeUpdateOpposing();
+}
+
+function colorCodeUpdatePlayerTop(){
+	var speCheck = document.getElementById("cc-spe-border").checked;
+	var ohkoCheck = document.getElementById("cc-ohko-color").checked;
+	if (!speCheck && !ohkoCheck) return;
+	var p1mon = document.getElementById("p1mon");
+	if (!p1mon) return;
+	var savedDamageResults = damageResults;
+	var p2 = createPokemon($("#p2"));
+	var idColor = calculationsColors($("#p1"), p2);
+	if (speCheck && ohkoCheck){
+		p1mon.className = `mon-speed-${idColor.speed} mon-dmg-${idColor.code}`;
+	}
+	else if (speCheck){
+		p1mon.className = `mon-speed-${idColor.speed}`;
+	}
+	else if (ohkoCheck){
+		p1mon.className = `mon-dmg-${idColor.code}`;
+	}
+	damageResults = savedDamageResults;
 }
 
 function colorCodeUpdateOpposing(){
@@ -2040,6 +2062,8 @@ function hideColorCodes(){
 	for (let i = 0; i < oppMons.length; i++) {
 		oppMons[i].className = "trainer-pok right-side";
 	}
+	var p1mon = document.getElementById("p1mon");
+	if (p1mon) p1mon.className = "";
 	document.getElementById("cc-auto-refr").checked = false;
 	HideShowCCSettings();
 }
@@ -2127,6 +2151,14 @@ function SpeedBorderSetsChange(ev){
 			monImg.classList.add("mon-speed-none")
 		}
 	}
+	var p1mon = document.getElementById("p1mon");
+	if (p1mon){
+		if (ev.target.checked){
+			p1mon.classList.remove("mon-speed-none");
+		}else{
+			p1mon.classList.add("mon-speed-none");
+		}
+	}
 	if (document.getElementById("cc-opp-color").checked){
 		var oppImgs = document.getElementsByClassName("right-side");
 		if (ev.target.checked){
@@ -2150,6 +2182,14 @@ function ColorCodeSetsChange(ev){
 	}else{
 		for (let monImg of monImgs){
 			monImg.classList.add("mon-dmg-none")
+		}
+	}
+	var p1mon = document.getElementById("p1mon");
+	if (p1mon){
+		if (ev.target.checked){
+			p1mon.classList.remove("mon-dmg-none");
+		}else{
+			p1mon.classList.add("mon-dmg-none");
 		}
 	}
 	if (document.getElementById("cc-opp-color").checked){
