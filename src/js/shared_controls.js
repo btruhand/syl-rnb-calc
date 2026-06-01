@@ -1837,6 +1837,7 @@ function colorCodeUpdate(){
 	if (!speCheck && !ohkoCheck){
 		return
 	}
+	var savedDamageResults = damageResults;
 	var pMons = document.getElementsByClassName("trainer-pok left-side");
 	// i calc here to alleviate some calculation
 	var p2info = $("#p2");
@@ -1854,6 +1855,7 @@ function colorCodeUpdate(){
 			pMons[i].className = `trainer-pok left-side mon-dmg-${idColor.code}`;
 		}
 	}
+	damageResults = savedDamageResults;
 	colorCodeUpdateOpposing();
 }
 
@@ -1866,6 +1868,7 @@ function colorCodeUpdateOpposing(){
 	}
 	var oppMons = document.getElementsByClassName("trainer-pok right-side");
 	if (oppMons.length === 0) return;
+	var savedDamageResults = damageResults;
 	// Pre-create player pokemon from form once (works for custom sets too).
 	// Pass as p2 so each opposing mon is p1 — this gives colors/speed from the
 	// opposing mon's perspective: speed "F" = opposing is faster (cyan), code "4"
@@ -1886,6 +1889,7 @@ function colorCodeUpdateOpposing(){
 			oppMons[i].className = `trainer-pok right-side mon-dmg-${idColor.code}`;
 		}
 	}
+	damageResults = savedDamageResults;
 }
 
 function showColorCodes(){
