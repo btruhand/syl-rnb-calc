@@ -954,7 +954,7 @@ function correctHiddenPower(pokemon) {
 	return pokemon;
 }
 
-function createPokemon(pokeInfo) {
+function createPokemon(pokeInfo, nameOverride) {
 	if (typeof pokeInfo === "string") { // in this case, pokeInfo is the id of an individual setOptions value whose moveset's tier matches the selected tier(s)
 		var name = pokeInfo.substring(0, pokeInfo.indexOf(" ("));
 		var setName = pokeInfo.substring(pokeInfo.indexOf("(") + 1, pokeInfo.lastIndexOf(")"));
@@ -994,7 +994,7 @@ function createPokemon(pokeInfo) {
 			});
 		}
 
-		return new calc.Pokemon(gen, name, {
+		return new calc.Pokemon(gen, nameOverride || name, {
 			level: set.level,
 			ability: set.ability,
 			abilityOn: true,
@@ -2030,7 +2030,8 @@ function colorCodeUpdateOpposing(){
 	for (let i = 0; i < oppMons.length; i++) {
 		let set = oppMons[i].getAttribute("data-id");
 		if (!set) continue;
-		let idColor = calculationsColors(set, playerPok);
+		let baseName = oppMons[i].getAttribute("data-base-name");
+		let idColor = calculationsColors(set, playerPok, baseName);
 		if (speCheck && ohkoCheck){
 			oppMons[i].className = `trainer-pok right-side mon-speed-${idColor.speed} mon-dmg-${idColor.code}`;
 		}

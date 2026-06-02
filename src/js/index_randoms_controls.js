@@ -220,12 +220,12 @@ function performCalculations() {
 }
 
 // calc colors
-function calculationsColors(p1info, p2) {
+function calculationsColors(p1info, p2, p1NameOverride) {
 	if (!p2) {
 		var p2info = $("#p2");
 		var p2 = createPokemon(p2info);
 	}
-	var p1 = createPokemon(p1info);
+	var p1 = createPokemon(p1info, p1NameOverride);
 	var p1field = createField();
 	var p2field = p1field.clone().swap();
 
