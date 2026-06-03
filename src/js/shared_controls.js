@@ -1772,6 +1772,7 @@ $(document).on('click', '.right-side', function () {
 			|| (basePokemon && basePokemon.ab)
 			|| "";
 		pokeObj.find(".ability").val(baseAbility).keyup();
+		pokeObj.find("select.forme").val(baseName);
 	}
 })
 
