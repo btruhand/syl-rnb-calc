@@ -220,13 +220,14 @@ function performCalculations() {
 }
 
 // calc colors
-function calculationsColors(p1info, p2, p1NameOverride) {
+function calculationsColors(p1info, p2, p1NameOverride, swapSides) {
 	if (!p2) {
 		var p2info = $("#p2");
 		var p2 = createPokemon(p2info);
 	}
 	var p1 = createPokemon(p1info, p1NameOverride);
 	var p1field = createField();
+	if (swapSides) p1field.swap();
 	var p2field = p1field.clone().swap();
 
 	damageResults = calculateAllMoves(gen, p1, p1field, p2, p2field);
@@ -245,7 +246,15 @@ function calculationsColors(p1info, p2, p1NameOverride) {
 	}
 
 	//Faster Tied Slower
-	var fastest = p1s > p2s ? "F" : p1s < p2s ? "S" : p1s === p2s ? "T" : undefined;
+	var isTrickRoom = p1field.isTrickRoom;
+	var fastest;
+	if (p1s === p2s) {
+		fastest = "T";
+	} else if (isTrickRoom) {
+		fastest = p1s < p2s ? "F" : "S";
+	} else {
+		fastest = p1s > p2s ? "F" : "S";
+	}
 	var result, highestRoll, lowestRoll, damage = 0;
 	//goes from the most optimist to the least optimist
 	var p1KO = 0, p2KO = 0;

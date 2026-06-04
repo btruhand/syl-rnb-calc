@@ -2032,7 +2032,7 @@ function colorCodeUpdateOpposing(){
 		let set = oppMons[i].getAttribute("data-id");
 		if (!set) continue;
 		let baseName = oppMons[i].getAttribute("data-base-name");
-		let idColor = calculationsColors(set, playerPok, baseName);
+		let idColor = calculationsColors(set, playerPok, baseName, true);
 		if (speCheck && ohkoCheck){
 			oppMons[i].className = `trainer-pok right-side mon-speed-${idColor.speed} mon-dmg-${idColor.code}`;
 		}
