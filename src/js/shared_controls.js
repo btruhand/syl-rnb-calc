@@ -2220,6 +2220,10 @@ function showChangelog() {
 	$('#changelog-overlay').fadeIn(200);
 }
 
+function showCredits() {
+	$('#credits-overlay').fadeIn(150);
+}
+
 function showMassExport() {
 	$('#massExport-overlay').fadeIn(200);
 }
@@ -2311,6 +2315,10 @@ $(document).ready(function () {
       	showChangelog();
     });
 
+	$('#show-credits').on('click', function () {
+      	showCredits();
+    });
+
     $('#changelog-close, #changelog-overlay').on('click', function (e) {
       if (e.target.id === 'changelog-close' || e.target.id === 'changelog-overlay') {
         $('#changelog-overlay').fadeOut(200);
@@ -2323,6 +2331,12 @@ $(document).ready(function () {
     $('#massExport-close, #massExport-overlay').on('click', function (e) {
       if (e.target.id === 'massExport-close' || e.target.id === 'massExport-overlay') {
         $('#massExport-overlay').fadeOut(200);
+      }
+    });
+
+	$('#credits-close, #credits-overlay').on('click', function (e) {
+      if (e.target.id === 'credits-close' || e.target.id === 'credits-overlay') {
+        $('#credits-overlay').fadeOut(200);
       }
     });
 });
