@@ -2576,7 +2576,7 @@ $("#sort-by-speed-btn").click(function () {
 	function getSpe(img) {
 		try { return createPokemon(img.dataset.id).stats.spe; } catch(e) { return -1; }
 	}
-	["#team-poke-list", "#box-poke-list", "#box-poke-list2"].forEach(function (selector) {
+	["#box-poke-list", "#box-poke-list2"].forEach(function (selector) {
 		var container = document.querySelector(selector);
 		if (!container) return;
 		var imgs = Array.from(container.querySelectorAll(".trainer-pok.left-side"));
@@ -2591,7 +2591,7 @@ $("#sort-by-speed-btn").click(function () {
 });
 
 $("#sort-by-name-btn").click(function () {
-	["#team-poke-list", "#box-poke-list", "#box-poke-list2"].forEach(function (selector) {
+	["#box-poke-list", "#box-poke-list2"].forEach(function (selector) {
 		var container = document.querySelector(selector);
 		if (!container) return;
 		var imgs = Array.from(container.querySelectorAll(".trainer-pok.left-side"));
