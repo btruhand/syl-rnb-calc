@@ -2099,7 +2099,6 @@ function hideColorCodes(){
 	if (p1mon) p1mon.className = "";
 	var p2mon = document.getElementById("p2mon");
 	if (p2mon) p2mon.className = "";
-	document.getElementById("cc-auto-refr").checked = false;
 	HideShowCCSettings();
 }
 
