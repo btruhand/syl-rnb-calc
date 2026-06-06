@@ -998,7 +998,49 @@ table.field {
     color: #333;
 }
 
-#changelog-content {
+#changelog-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.changelog-tab {
+    background: #2a2a2a;
+    color: #aaa;
+    border: 1px solid #444;
+    border-radius: 4px 4px 0 0;
+    padding: 6px 14px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.changelog-tab.active {
+    background: #141414;
+    color: #fff;
+    border-bottom-color: #141414;
+}
+
+.changelog-tab:hover {
+    color: #fff;
+}
+
+.changelog-new-badge {
+    display: none;
+    background: #e74c3c;
+    color: #fff;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+.changelog-new-badge.visible {
+    display: inline-block;
+}
+
+.changelog-panel {
     margin-top: 7px;
     font-family: Arial, sans-serif;
     font-size: 22px;
@@ -1008,11 +1050,12 @@ table.field {
     padding-right: 15px;
 }
 
-#changelog-content-list {
+#changelog-content-list,
+#bjir-changelog-content-list {
     padding: 0px 25px;
 }
 
-#changelog-content li {
+.changelog-panel li {
     margin-bottom: 4px;
 }
 

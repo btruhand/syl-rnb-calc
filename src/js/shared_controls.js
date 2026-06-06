@@ -2364,6 +2364,25 @@ function showAiOptionsAndDisclaimers() {
 	showDisclaimers();
 }
 
+function renderChangelogGrouped(items, listSelector) {
+	var groups = [];
+	var versionMap = {};
+	for (var entry of items) {
+		var key = entry.majorVersion + '.' + entry.minorVersion + '.' + entry.patchVersion;
+		if (!versionMap[key]) {
+			versionMap[key] = [];
+			groups.push({ key: key, entries: versionMap[key] });
+		}
+		versionMap[key].push(entry.desc);
+	}
+	for (var group of groups) {
+		var inner = group.entries.length === 1
+			? ' - ' + group.entries[0]
+			: '<ul>' + group.entries.map(function(d) { return '<li>' + d + '</li>'; }).join('') + '</ul>';
+		$(listSelector).prepend('<li><strong>v' + group.key + '</strong>' + inner + '</li>');
+	}
+}
+
 function showChangelog() {
 	$('#changelog-overlay').fadeIn(200);
 }
@@ -2452,18 +2471,43 @@ $(document).ready(function () {
 	hideAiOptionsAndDisclaimers();
 
 	// set changelog text
-	for (var changeLogLine of CHANGELOG) {
-		$("#changelog-content-list")
-		.prepend(`<li><strong>v${changeLogLine.majorVersion}.${changeLogLine.minorVersion}.${changeLogLine.patchVersion}</strong> - ${changeLogLine.desc}</li>`)
+	renderChangelogGrouped(CHANGELOG, "#changelog-content-list");
+	var changeLogLine = CHANGELOG[CHANGELOG.length - 1];
+	const latestChangelogVersion = `${changeLogLine.majorVersion}.${changeLogLine.minorVersion}.${changeLogLine.patchVersion}`;
+
+	// set bjir changelog text
+	renderChangelogGrouped(BJIR_CHANGELOG, "#bjir-changelog-content-list");
+	var bjirChangeLogLine = BJIR_CHANGELOG[BJIR_CHANGELOG.length - 1];
+	const latestBjirVersion = `${bjirChangeLogLine.majorVersion}.${bjirChangeLogLine.minorVersion}.${bjirChangeLogLine.patchVersion}`;
+
+	const mainIsNew = localStorage.getItem("lastChangelogVersion") !== latestChangelogVersion;
+	const bjirIsNew = localStorage.getItem("lastBjirChangelogVersion") !== latestBjirVersion;
+
+	if (mainIsNew) {
+		$('#changelog-main-badge').addClass('visible');
+	}
+	if (bjirIsNew) {
+		$('#changelog-bjir-badge').addClass('visible');
 	}
 
-	const latestChangelogVersion = `${changeLogLine.majorVersion}.${changeLogLine.minorVersion}.${changeLogLine.patchVersion}`;
-	// console.log(latestChangelogVersion); // DEBUG
-
-	// show changelog
-	if (localStorage.getItem("lastChangelogVersion") !== latestChangelogVersion) {
+	// show changelog if either tab has new entries
+	if (mainIsNew || bjirIsNew) {
 		showChangelog();
 	}
+
+	// tab switching
+	$('.changelog-tab').on('click', function () {
+		$('.changelog-tab').removeClass('active');
+		$(this).addClass('active');
+		var tab = $(this).data('tab');
+		if (tab === 'main') {
+			$('#changelog-content').removeAttr('hidden');
+			$('#bjir-changelog-content').attr('hidden', '');
+		} else {
+			$('#bjir-changelog-content').removeAttr('hidden');
+			$('#changelog-content').attr('hidden', '');
+		}
+	});
 
 	$('#show-changelog').on('click', function () {
       	showChangelog();
@@ -2476,10 +2520,11 @@ $(document).ready(function () {
     $('#changelog-close, #changelog-overlay').on('click', function (e) {
       if (e.target.id === 'changelog-close' || e.target.id === 'changelog-overlay') {
         $('#changelog-overlay').fadeOut(200);
-      }
-	  if (localStorage.getItem("lastChangelogVersion") !== latestChangelogVersion) {
 		localStorage.setItem("lastChangelogVersion", latestChangelogVersion);
-	  }
+		localStorage.setItem("lastBjirChangelogVersion", latestBjirVersion);
+		$('#changelog-main-badge').removeClass('visible');
+		$('#changelog-bjir-badge').removeClass('visible');
+      }
     });
 
     $('#massExport-close, #massExport-overlay').on('click', function (e) {
