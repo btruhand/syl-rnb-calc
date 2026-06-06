@@ -23,4 +23,5 @@ const BJIR_CHANGELOG = [
 		0,
 		"Opposing team roster now shows base form of mega Pokémon",
 	),
+	new ChangelogLine(1, 0, 1, "Add 'Sort by name' option for player box"),
 ];
