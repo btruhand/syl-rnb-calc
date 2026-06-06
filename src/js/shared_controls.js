@@ -1884,6 +1884,8 @@ $(document).on('click', '.right-side', function () {
 		pokeObj.find("select.forme").val(baseName);
 		pokeObj.find(".ability").val(baseAbility).keyup();
 	}
+	colorCodeUpdatePlayerTop();
+	colorCodeUpdateOpposingTop();
 })
 
 $(document).on('click', '.left-side', function () {
@@ -1892,7 +1894,8 @@ $(document).on('click', '.left-side', function () {
 	$('.player').val(set);
 	$('.player').change();
 	$('.player .select2-chosen').text(set);
-	colorCodeUpdateOpposing();
+	colorCodeUpdatePlayerTop();
+	colorCodeUpdateOpposingTop();
 })
 
 $(document).on('change', '#p2 .i-f-o-move select.move-selector', function () {
@@ -1993,10 +1996,12 @@ function colorCodeUpdate(){
 	}
 	damageResults = savedDamageResults;
 	colorCodeUpdatePlayerTop();
+	colorCodeUpdateOpposingTop();
 	colorCodeUpdateOpposing();
 }
 
 function colorCodeUpdatePlayerTop(){
+	if (document.getElementById("cc-sets").hasAttribute("hidden")) return;
 	var speCheck = document.getElementById("cc-spe-border").checked;
 	var ohkoCheck = document.getElementById("cc-ohko-color").checked;
 	if (!speCheck && !ohkoCheck) return;
@@ -2013,6 +2018,27 @@ function colorCodeUpdatePlayerTop(){
 	}
 	else if (ohkoCheck){
 		p1mon.className = `mon-dmg-${idColor.code}`;
+	}
+	damageResults = savedDamageResults;
+}
+
+function colorCodeUpdateOpposingTop(){
+	if (document.getElementById("cc-sets").hasAttribute("hidden")) return;
+	var speCheck = document.getElementById("cc-spe-border").checked;
+	var ohkoCheck = document.getElementById("cc-ohko-color").checked;
+	var oppCheck = document.getElementById("cc-opp-color").checked;
+	if (!oppCheck || (!speCheck && !ohkoCheck)) return;
+	var p2mon = document.getElementById("p2mon");
+	if (!p2mon) return;
+	var savedDamageResults = damageResults;
+	var playerPok = createPokemon($("#p1"));
+	var idColor = calculationsColors($("#p2"), playerPok, null, true);
+	if (speCheck && ohkoCheck){
+		p2mon.className = `mon-speed-${idColor.speed} mon-dmg-${idColor.code}`;
+	} else if (speCheck){
+		p2mon.className = `mon-speed-${idColor.speed}`;
+	} else if (ohkoCheck){
+		p2mon.className = `mon-dmg-${idColor.code}`;
 	}
 	damageResults = savedDamageResults;
 }
@@ -2071,6 +2097,8 @@ function hideColorCodes(){
 	}
 	var p1mon = document.getElementById("p1mon");
 	if (p1mon) p1mon.className = "";
+	var p2mon = document.getElementById("p2mon");
+	if (p2mon) p2mon.className = "";
 	document.getElementById("cc-auto-refr").checked = false;
 	HideShowCCSettings();
 }
@@ -2192,6 +2220,14 @@ function SpeedBorderSetsChange(ev){
 				monImg.classList.add("mon-speed-none")
 			}
 		}
+		var p2mon = document.getElementById("p2mon");
+		if (p2mon){
+			if (ev.target.checked){
+				p2mon.classList.remove("mon-speed-none");
+			}else{
+				p2mon.classList.add("mon-speed-none");
+			}
+		}
 	}
 }
 
@@ -2225,17 +2261,28 @@ function ColorCodeSetsChange(ev){
 				monImg.classList.add("mon-dmg-none")
 			}
 		}
+		var p2mon = document.getElementById("p2mon");
+		if (p2mon){
+			if (ev.target.checked){
+				p2mon.classList.remove("mon-dmg-none");
+			}else{
+				p2mon.classList.add("mon-dmg-none");
+			}
+		}
 	}
 }
 
 function OppColorSetsChange(ev){
 	if (ev.target.checked){
+		colorCodeUpdateOpposingTop();
 		colorCodeUpdateOpposing();
 	}else{
 		var oppMons = document.getElementsByClassName("trainer-pok right-side");
 		for (let mon of oppMons){
 			mon.className = "trainer-pok right-side";
 		}
+		var p2mon = document.getElementById("p2mon");
+		if (p2mon) p2mon.className = "";
 	}
 }
 function setupSideCollapsers(){
