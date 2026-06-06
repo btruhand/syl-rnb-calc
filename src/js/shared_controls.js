@@ -2572,6 +2572,24 @@ $("#mainResult").click(function () {
 	});
 });
 
+$("#sort-by-speed-btn").click(function () {
+	function getSpe(img) {
+		try { return createPokemon(img.dataset.id).stats.spe; } catch(e) { return -1; }
+	}
+	["#team-poke-list", "#box-poke-list", "#box-poke-list2"].forEach(function (selector) {
+		var container = document.querySelector(selector);
+		if (!container) return;
+		var imgs = Array.from(container.querySelectorAll(".trainer-pok.left-side"));
+		imgs.sort(function (a, b) {
+			var aSpd = getSpe(a);
+			var bSpd = getSpe(b);
+			if (bSpd !== aSpd) return bSpd - aSpd;
+			return a.dataset.id.localeCompare(b.dataset.id);
+		});
+		imgs.forEach(function (img) { container.appendChild(img); });
+	});
+});
+
 $("#sort-by-name-btn").click(function () {
 	["#team-poke-list", "#box-poke-list", "#box-poke-list2"].forEach(function (selector) {
 		var container = document.querySelector(selector);
