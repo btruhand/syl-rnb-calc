@@ -1664,7 +1664,8 @@ function addBoxed(poke) {
 	newPoke.src = getSrcImgPokemon(poke);
 	newPoke.dataset.id = `${poke.name} (${poke.nameProp})`
 	newPoke.addEventListener("dragstart", dragstart_handler);
-	$('#box-poke-list')[0].appendChild(newPoke)
+	var containerId = poke.containerId || 'box-poke-list';
+	document.getElementById(containerId).appendChild(newPoke);
 }
 
 function getSrcImgPokemon(poke) {
@@ -2109,11 +2110,25 @@ function dragstart_handler(ev) {
 	pokeDragged = ev.target;
 }
 
+function savePokeContainerId(pokeImg, containerId) {
+	if (!localStorage.customsets) return;
+	var dataId = pokeImg.dataset.id;
+	var parenIdx = dataId.lastIndexOf(" (");
+	var name = dataId.substring(0, parenIdx);
+	var nameProp = dataId.substring(parenIdx + 2, dataId.length - 1);
+	var customsets = JSON.parse(localStorage.customsets);
+	if (customsets[name] && customsets[name][nameProp]) {
+		customsets[name][nameProp].containerId = containerId;
+		localStorage.customsets = JSON.stringify(customsets);
+	}
+}
+
 function drop(ev) {
 	ev.preventDefault();
 	if (ev.target.classList.contains("dropzone")) {
 		pokeDragged.parentNode.removeChild(pokeDragged);
-		ev.target.appendChild(pokeDragged);	
+		ev.target.appendChild(pokeDragged);
+		savePokeContainerId(pokeDragged, ev.target.id);
 	}
 	// if it's a pokemon
 	else if(ev.target.classList.contains("left-side")) {
@@ -2129,6 +2144,7 @@ function drop(ev) {
 		else{
 			let prev1 = ev.target.previousSibling || ev.target;
 			prev1.after(pokeDragged);
+			savePokeContainerId(pokeDragged, ev.target.parentNode.id);
 		}
 	}
 	ev.target.classList.remove('over');
