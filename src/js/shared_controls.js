@@ -1881,8 +1881,8 @@ $(document).on('click', '.right-side', function () {
 		var baseAbility = (MEGA_BASE_ABILITIES[mbaKey] && MEGA_BASE_ABILITIES[mbaKey][baseName])
 			|| (basePokemon && basePokemon.ab)
 			|| "";
-		pokeObj.find(".ability").val(baseAbility).keyup();
 		pokeObj.find("select.forme").val(baseName);
+		pokeObj.find(".ability").val(baseAbility).keyup();
 	}
 })
 
