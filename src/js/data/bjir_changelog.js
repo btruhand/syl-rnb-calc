@@ -53,4 +53,10 @@ const BJIR_CHANGELOG = [
 		2,
 		"Properly sets last trainer on dropdown selection",
 	),
+	new ChangelogLine(
+		1,
+		3,
+		0,
+		"Add color coding and speed border for opposing team's selected Pokémon sprite; rename 'Opponent Color' option to 'Opponent Color/Speed Border'",
+	),
 ];
