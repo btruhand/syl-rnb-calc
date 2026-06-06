@@ -23,11 +23,22 @@ const BJIR_CHANGELOG = [
 		0,
 		"Opposing team roster now shows base form of mega Pokémon",
 	),
-	new ChangelogLine(1, 0, 1, "Add 'Sort by name' option for player box"),
+	new ChangelogLine(
+		1,
+		0,
+		1,
+		"Add 'Sort by name' option for player box; lexicographic ordering, earlier name first",
+	),
 	new ChangelogLine(
 		1,
 		0,
 		2,
 		"Keep Pokémon in their respective boxes when reloading",
+	),
+	new ChangelogLine(
+		1,
+		0,
+		3,
+		"Add 'Sort by speed' option for player box; descendingly sorts by speed stat then lexicographically by name if speeds are equal, earlier name first)",
 	),
 ];
