@@ -566,6 +566,10 @@ $(".set-selector").change(function () {
 		topPokemonIcon(fullSetName, $("#p2mon")[0]);
 		CURRENT_TRAINER_POKS = get_trainer_poks(fullSetName);
 		var next_poks = CURRENT_TRAINER_POKS.sort(sortmons);
+		if (!window.pageInitializing) {
+			var trainerIndex = parseInt(next_poks[0].split("[")[1].split("]")[0]);
+			if (!isNaN(trainerIndex)) localStorage.setItem("lasttimetrainer", trainerIndex);
+		}
 
 		var trpok_html = ""
 		for (i in next_poks) {
@@ -2416,6 +2420,7 @@ function showMassExportR() {
 }
 
 $(document).ready(function () {
+	window.pageInitializing = true;
 	var params = new URLSearchParams(window.location.search);
 	var g = GENERATION[params.get('gen')] || 8;
 	$("#gen" + g).prop("checked", true);
@@ -2432,6 +2437,7 @@ $(document).ready(function () {
 			return text.toUpperCase().indexOf(term.toUpperCase()) === 0 || text.toUpperCase().indexOf(" " + term.toUpperCase()) >= 0;
 		}
 	});
+	let last = localStorage.getItem("lasttimetrainer");
 	$(".set-selector").val(getFirstValidSetOption().id);
 	$(".set-selector").change();
 	refreshCritRateLabels();
@@ -2459,10 +2465,10 @@ $(document).ready(function () {
 		dropzone.ondragover=allowDrop;
 	}
 	//select last trainer
-	let last = localStorage.getItem("lasttimetrainer");
-	if (last != "") {
+	if (last !== null && !isNaN(parseInt(last, 10))) {
 		selectTrainer(parseInt(last, 10));
 	};
+	window.pageInitializing = false;
 
 	// set crit checkboxes to align their values
 	/* Crits on the top of the screen */
