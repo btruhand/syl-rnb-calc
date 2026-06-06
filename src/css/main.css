@@ -1,3 +1,13 @@
+#cc-sets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    align-items: center;
+}
+#cc-sets[hidden] {
+    display: none;
+}
+
 /* header */
 a img {
     border: 0;
