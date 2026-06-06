@@ -2087,18 +2087,6 @@ function refreshColorCode(){
 }
 
 function hideColorCodes(){
-	var pMons = document.getElementsByClassName("trainer-pok left-side");
-	for (let i = 0; i < pMons.length; i++) {
-		pMons[i].className = "trainer-pok left-side";
-	}
-	var oppMons = document.getElementsByClassName("trainer-pok right-side");
-	for (let i = 0; i < oppMons.length; i++) {
-		oppMons[i].className = "trainer-pok right-side";
-	}
-	var p1mon = document.getElementById("p1mon");
-	if (p1mon) p1mon.className = "";
-	var p2mon = document.getElementById("p2mon");
-	if (p2mon) p2mon.className = "";
 	HideShowCCSettings();
 }
 
