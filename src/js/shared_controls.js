@@ -1000,7 +1000,7 @@ function createPokemon(pokeInfo, nameOverride) {
 
 		return new calc.Pokemon(gen, nameOverride || name, {
 			level: set.level,
-			ability: set.ability,
+			ability: nameOverride ? (pokedex[nameOverride]?.abilities?.[0] || set.ability) : set.ability,
 			abilityOn: true,
 			item: set.item && typeof set.item !== "undefined" && (set.item === "Eviolite" || set.item.indexOf("ite") < 0) ? set.item : "",
 			nature: set.nature,
