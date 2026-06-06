@@ -2555,3 +2555,31 @@ $("#mainResult").click(function () {
 		}, 2000);
 	});
 });
+
+$("#sort-by-name-btn").click(function () {
+	["#team-poke-list", "#box-poke-list", "#box-poke-list2"].forEach(function (selector) {
+		var container = document.querySelector(selector);
+		if (!container) return;
+		var imgs = Array.from(container.querySelectorAll(".trainer-pok.left-side"));
+		imgs.sort(function (a, b) {
+			return a.dataset.id.localeCompare(b.dataset.id);
+		});
+		imgs.forEach(function (img) { container.appendChild(img); });
+	});
+
+	if (!localStorage.customsets) return;
+	var customsets = JSON.parse(localStorage.customsets);
+	var allImgs = Array.from(document.querySelectorAll(".trainer-pok.left-side"));
+	var newCustomsets = {};
+	allImgs.forEach(function (img) {
+		var dataId = img.dataset.id;
+		var parenIdx = dataId.lastIndexOf(" (");
+		var name = dataId.substring(0, parenIdx);
+		var nameProp = dataId.substring(parenIdx + 2, dataId.length - 1);
+		if (customsets[name] && customsets[name][nameProp]) {
+			if (!newCustomsets[name]) newCustomsets[name] = {};
+			newCustomsets[name][nameProp] = customsets[name][nameProp];
+		}
+	});
+	localStorage.customsets = JSON.stringify(newCustomsets);
+});
