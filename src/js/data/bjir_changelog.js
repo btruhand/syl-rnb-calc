@@ -41,4 +41,16 @@ const BJIR_CHANGELOG = [
 		0,
 		"Add 'Sort by speed' option for player box; descendingly sorts by speed stat then lexicographically by name if speeds are equal, earlier name first)",
 	),
+	new ChangelogLine(
+		1,
+		2,
+		1,
+		"Fix hide/show for color coding to work again, it was always shown before",
+	),
+	new ChangelogLine(
+		1,
+		2,
+		2,
+		"Properly sets last trainer on dropdown selection",
+	),
 ];
