@@ -69,6 +69,7 @@ var TRAINER_METADATA = {
 	"Swimmer♀ Carlee & Harrison": { isDouble: true, battleType: "pseudo" },
 	"Swimmer♀ Grace & Declan": { isDouble: true, battleType: "pseudo" },
 	"Swimmer♀ Rose & Deandre": { isDouble: true, battleType: "pseudo" },
+	"Aqua Leader Archie Mt Pyre": { isDouble: true, battleType: "true" },
 	"Team Aqua Grunt Mt Pyre #5 & GruntMtPyre6": { isDouble: true, battleType: "pseudo" },
 	"Triathlete Chase & Allison": { isDouble: true, battleType: "pseudo" },
 };
