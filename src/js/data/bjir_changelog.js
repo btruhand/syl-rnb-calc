@@ -77,4 +77,10 @@ const BJIR_CHANGELOG = [
 		1,
 		"Fix opposing trainer dropdown incorrectly showing Winstrate Victoria after reload in an edge case",
 	),
+	new ChangelogLine(
+		1,
+		5,
+		0,
+		"Add auto-detect doubles optional feature; Add optional team slots support for double battles",
+	),
 ];
