@@ -565,6 +565,16 @@ $(".set-selector").change(function () {
 	if ($(this).hasClass('opposing')) {
 		topPokemonIcon(fullSetName, $("#p2mon")[0]);
 		CURRENT_TRAINER_POKS = get_trainer_poks(fullSetName);
+		if ($("#auto-detect-doubles").is(":checked")) {
+			var metadata = (typeof TRAINER_METADATA !== 'undefined') ? TRAINER_METADATA[window.CURRENT_TRAINER] : null;
+			var shouldBeDoubles = !!(metadata && metadata.isDouble);
+			if (shouldBeDoubles) {
+				$("#doubles-format").prop("checked", true).trigger("change");
+			} else {
+				$("#singles-format").prop("checked", true).trigger("change");
+			}
+			updateSingleDoublesIcon();
+		}
 		var next_poks = CURRENT_TRAINER_POKS.sort(sortmons);
 		if (!window.pageInitializing) {
 			var trainerIndex = parseInt(next_poks[0].split("[")[1].split("]")[0]);
@@ -1684,12 +1694,18 @@ function getSrcImgPokemon(poke) {
 	}
 }
 
+function extractTrainerName(monAndTrainer) {
+	var start = monAndTrainer.indexOf("(") + 1;
+	var end = monAndTrainer.lastIndexOf(")");
+	return monAndTrainer.substring(start, end);
+}
+
 function get_trainer_poks(trainer_name) {
-	var true_name = trainer_name.split("(")[1].split("\n")[0].trim()
-	window.CURRENT_TRAINER = true_name.substring(0, true_name.length -1);
+	var true_name = extractTrainerName(trainer_name);
+	window.CURRENT_TRAINER = true_name;
 	var matches = []
 	for (i in TR_NAMES) {
-		if (TR_NAMES[i].includes(true_name)) {
+		if (TR_NAMES[i].includes(`(${true_name})`)) {
 			matches.push(TR_NAMES[i])
 		}
 	}
@@ -2492,6 +2508,10 @@ $(document).ready(function () {
 	$('#cc-opp-color')[0].checked=false;
 	$('#singles-format').click(updateSingleDoublesIcon);
 	$('#doubles-format').click(updateSingleDoublesIcon);
+	$('#auto-detect-doubles').prop('checked', localStorage.getItem('autoDetectDoubles') === 'true');
+	$('#auto-detect-doubles').change(function () {
+		localStorage.setItem('autoDetectDoubles', this.checked);
+	});
 	for (let dropzone of document.getElementsByClassName("dropzone")) {
 		dropzone.ondragenter=handleDragEnter;
 		dropzone.ondragleave=handleDragLeave;
