@@ -161,7 +161,7 @@ function parseSetsFromTrainerTeam(trainerPoks) {
 		var afterBracket = entry.split("]")[1];
 		if (!afterBracket) continue;
 		var monName = afterBracket.split(" (")[0];
-		var trainerName = entry.split("(")[1].split(")")[0];
+		var trainerName = afterBracket.substring(afterBracket.indexOf("(") + 1, afterBracket.lastIndexOf(")"));
 
 		if (!setdex[monName] || !setdex[monName][trainerName]) continue;
 
