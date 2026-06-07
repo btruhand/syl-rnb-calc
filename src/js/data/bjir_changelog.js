@@ -59,4 +59,22 @@ const BJIR_CHANGELOG = [
 		0,
 		"Add color coding and speed border for opposing team's selected Pokémon sprite; rename 'Opponent Color' option to 'Opponent Color/Speed Border'",
 	),
+	new ChangelogLine(
+		1,
+		3,
+		1,
+		"Fix 'Export all' not working with Space tag battle",
+	),
+	new ChangelogLine(
+		1,
+		4,
+		0,
+		"Add 'Auto-detect doubles' option in Field table",
+	),
+	new ChangelogLine(
+		1,
+		4,
+		1,
+		"Fix opposing trainer dropdown incorrectly showing Winstrate Victoria after reload in an edge case",
+	),
 ];
