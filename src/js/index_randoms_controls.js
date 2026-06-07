@@ -230,7 +230,7 @@ function calculationsColors(p1info, p2, p1NameOverride, swapSides) {
 	if (swapSides) p1field.swap();
 	var p2field = p1field.clone().swap();
 
-	damageResults = calculateAllMoves(gen, p1, p1field, p2, p2field);
+	damageResults = calculateAllMoves(gen, p1, p1field, p2, p2field, swapSides);
 	p1 = damageResults[0][0].attacker;
 	p2 = damageResults[1][0].attacker;
 	p1.maxDamages = [];
@@ -374,8 +374,8 @@ function checkStatBoost(p1, p2) {
 	}
 }
 
-function calculateAllMoves(gen, p1, p1field, p2, p2field) {
-	checkStatBoost(p1, p2);
+function calculateAllMoves(gen, p1, p1field, p2, p2field, swapSides) {
+	checkStatBoost(swapSides ? p2 : p1, swapSides ? p1 : p2);
 	var results = [[], []];
 	for (var i = 0; i < 4; i++) {
 		results[0][i] = calc.calculate(gen, p1, p2, p1.moves[i], p1field);
