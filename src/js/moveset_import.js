@@ -585,8 +585,6 @@ $(document).ready(function () {
 		updateDex(customSets);
 		selectFirstMon();
 		$(allPokemon("#importedSetsOptions")).css("display", "inline");
-	} else {
-		loadDefaultLists();
 	}
 	//adjust the side buttons that collapse the data wished to be hidden
 	setupSideCollapsers();
