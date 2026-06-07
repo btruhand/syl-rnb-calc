@@ -564,7 +564,9 @@ $(".set-selector").change(function () {
 	var fullSetName = $(this).val();
 	if ($(this).hasClass('opposing')) {
 		topPokemonIcon(fullSetName, $("#p2mon")[0]);
+		var prevTrainer = window.CURRENT_TRAINER;
 		CURRENT_TRAINER_POKS = get_trainer_poks(fullSetName);
+		var trainerChanged = window.CURRENT_TRAINER !== prevTrainer;
 		if ($("#auto-detect-doubles").is(":checked")) {
 			var metadata = (typeof TRAINER_METADATA !== 'undefined') ? TRAINER_METADATA[window.CURRENT_TRAINER] : null;
 			var shouldBeDoubles = !!(metadata && metadata.isDouble);
@@ -603,13 +605,16 @@ $(".set-selector").change(function () {
 			var pok = `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${pok_name}.png" data-id="${CURRENT_TRAINER_POKS[i].split("]")[1]}" title="${next_poks[i]}, ${next_poks[i]} BP">`
 			trpok_html += pok
 		}
+		if (trainerChanged) {
+			$('.trainer-pok-list-opposing').html(trpok_html);
+			$('#opp-slot-2').empty();
+			if ($('#enable-team-slots').is(':checked') && $("input:radio[name='format']:checked").val() === 'Doubles') {
+				setOppPoksDraggable(true);
+			}
+		}
+		colorCodeUpdateOpposing();
 	} else {
 		topPokemonIcon(fullSetName, $("#p1mon")[0])
-	}
-
-	$('.trainer-pok-list-opposing').html(trpok_html);
-	if ($(this).hasClass('opposing')){
-		colorCodeUpdateOpposing();
 	}
 	var setIndex = $(this).prop('title');
 	var pokemonName = fullSetName.substring(0, fullSetName.indexOf(" ("));
@@ -1678,7 +1683,8 @@ function addBoxed(poke) {
 	newPoke.src = getSrcImgPokemon(poke);
 	newPoke.dataset.id = `${poke.name} (${poke.nameProp})`
 	newPoke.addEventListener("dragstart", dragstart_handler);
-	var containerId = poke.containerId || 'box-poke-list';
+	var BOX_CONTAINERS = ['box-poke-list', 'box-poke-list2'];
+	var containerId = BOX_CONTAINERS.includes(poke.containerId) ? poke.containerId : 'box-poke-list';
 	document.getElementById(containerId).appendChild(newPoke);
 }
 
@@ -1952,16 +1958,16 @@ function selectTrainer(value) {
 }
 
 function nextTrainer() {
-	string = ($(".trainer-pok-list-opposing")).html()
-	initialSplit = string.split("[")
-	value = parseInt(initialSplit[initialSplit.length - 2].split("]")[0]) + 1
-	selectTrainer(value)
+	var string = ($(".trainer-pok-list-opposing")).html() + ($('#opp-slot-2').html() || "");
+	var initialSplit = string.split("[");
+	var value = parseInt(initialSplit[initialSplit.length - 2].split("]")[0]) + 1;
+	selectTrainer(value);
 }
 
 function previousTrainer() {
-	string = ($(".trainer-pok-list-opposing")).html();
-	value = parseInt(string.split("]")[0].split("[")[1]) - 1;
-	selectTrainer(value)
+	var string = ($(".trainer-pok-list-opposing")).html() + ($('#opp-slot-2').html() || "");
+	var value = parseInt(string.split("]")[0].split("[")[1]) - 1;
+	selectTrainer(value);
 }
 
 function resetTrainer() {
@@ -2160,6 +2166,27 @@ function savePokeContainerId(pokeImg, containerId) {
 
 function drop(ev) {
 	ev.preventDefault();
+	if (!pokeDragged) return;
+
+	if (pokeDragged.classList.contains("right-side")) {
+		if (ev.target.classList.contains("opp-slot-dropzone")) {
+			pokeDragged.parentNode.removeChild(pokeDragged);
+			ev.target.appendChild(pokeDragged);
+		} else if (ev.target.classList.contains("right-side") && ev.target !== pokeDragged) {
+			if (ev.target.parentNode == pokeDragged.parentNode) {
+				let prev1 = ev.target.previousSibling || ev.target;
+				let prev2 = pokeDragged.previousSibling || pokeDragged;
+				prev1.after(pokeDragged);
+				prev2.after(ev.target);
+			} else {
+				let prev1 = ev.target.previousSibling || ev.target;
+				prev1.after(pokeDragged);
+			}
+		}
+		ev.target.classList.remove('over');
+		return;
+	}
+
 	if (ev.target.classList.contains("dropzone")) {
 		pokeDragged.parentNode.removeChild(pokeDragged);
 		ev.target.appendChild(pokeDragged);
@@ -2387,6 +2414,68 @@ function updateSingleDoublesIcon() {
 	} else {
 		document.getElementById("monDouble").setAttribute('hidden', '');
 	}
+	updateTeamSlotsVisibility();
+}
+
+function repopulateOppTrainerPoks() {
+	if (!CURRENT_TRAINER_POKS || !CURRENT_TRAINER_POKS.length) return;
+	var next_poks = CURRENT_TRAINER_POKS.sort(sortmons);
+	var trpok_html = "";
+	for (var i in next_poks) {
+		if (next_poks[i][0].includes($('input.opposing').val())) {
+			continue;
+		}
+		var pok_name = next_poks[i].split("]")[1].split(" (")[0];
+		if (pok_name == "Zygarde-10%") {
+			pok_name = "Zygarde-10%25";
+		}
+		if (pok_name.includes("Vivillon")) {
+			pok_name = "Vivillon";
+		}
+		// this ruined my day
+		if (pok_name.includes("-Mega")) {
+			var base_name = pok_name.split("-Mega")[0];
+			var mega_data_id = CURRENT_TRAINER_POKS[i].split("]")[1];
+			trpok_html += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${base_name}.png" data-id="${mega_data_id}" data-base-name="${base_name}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
+		}
+		var pok = `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${pok_name}.png" data-id="${CURRENT_TRAINER_POKS[i].split("]")[1]}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
+		trpok_html += pok;
+	}
+	$('.trainer-pok-list-opposing').html(trpok_html);
+	$('#opp-slot-2').empty();
+	colorCodeUpdateOpposing();
+}
+
+function setOppPoksDraggable(draggable) {
+	var oppMons = document.getElementsByClassName("trainer-pok right-side");
+	for (let mon of oppMons) {
+		mon.draggable = draggable;
+		if (draggable) {
+			mon.addEventListener("dragstart", dragstart_handler);
+		} else {
+			mon.removeEventListener("dragstart", dragstart_handler);
+		}
+	}
+}
+
+function updateTeamSlotsVisibility() {
+	var isDoubles = $("input:radio[name='format']:checked").val() === 'Doubles';
+	var slotsEnabled = $('#enable-team-slots').is(':checked');
+	var showSlots = isDoubles && slotsEnabled;
+
+	$('#player-slot-1-label, #player-slot-hr, #player-slot-2-label').toggle(showSlots);
+	$('#team-slot-2').toggle(showSlots);
+	$('#opp-slot-1-label, #opp-slot-hr, #opp-slot-2-label').toggle(showSlots);
+	$('#opp-slot-2').toggle(showSlots);
+
+	setOppPoksDraggable(showSlots);
+
+	if (!showSlots) {
+		$('#team-slot-2 .trainer-pok').each(function () {
+			$('#team-poke-list').append(this);
+		});
+		repopulateOppTrainerPoks();
+	}
 }
 
 function hideAiOptions() {
@@ -2512,11 +2601,23 @@ $(document).ready(function () {
 	$('#auto-detect-doubles').change(function () {
 		localStorage.setItem('autoDetectDoubles', this.checked);
 	});
+	$('#enable-team-slots').prop('checked', localStorage.getItem('enableTeamSlots') === 'true');
+	$('#enable-team-slots').change(function () {
+		localStorage.setItem('enableTeamSlots', this.checked);
+		updateTeamSlotsVisibility();
+	});
+	updateTeamSlotsVisibility();
 	for (let dropzone of document.getElementsByClassName("dropzone")) {
 		dropzone.ondragenter=handleDragEnter;
 		dropzone.ondragleave=handleDragLeave;
 		dropzone.ondrop=drop;
 		dropzone.ondragover=allowDrop;
+	}
+	for (let zone of document.getElementsByClassName("opp-slot-dropzone")) {
+		zone.ondragenter=handleDragEnter;
+		zone.ondragleave=handleDragLeave;
+		zone.ondrop=drop;
+		zone.ondragover=allowDrop;
 	}
 	//select last trainer
 	if (last !== null && !isNaN(parseInt(last, 10))) {

@@ -900,6 +900,24 @@ table.field {
     min-height: 30px;
 }
 
+.slot-label {
+    text-align: center;
+    font-size: 0.8em;
+    font-weight: bold;
+    padding: 2px 4px;
+    border-radius: 3px;
+    margin-bottom: 2px;
+    background: rgba(128, 128, 128, 0.15);
+}
+
+.slot-hr {
+    margin: 4px 0;
+}
+
+.opp-slot-dropzone {
+    min-height: 30px;
+}
+
 .deadzone:hover{
     background: #722323;
 }

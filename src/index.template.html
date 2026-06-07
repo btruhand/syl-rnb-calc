@@ -374,7 +374,12 @@
                 </legend>
                 <div>
                     <legend align="center">Team</legend>
+                    <div class="slot-label" id="player-slot-1-label" style="display:none">Slot 1</div>
                     <div id="team-poke-list" class="box-poke dropzone">
+                    </div>
+                    <hr class="slot-hr" id="player-slot-hr" style="display:none">
+                    <div class="slot-label" id="player-slot-2-label" style="display:none">Slot 2</div>
+                    <div id="team-slot-2" class="box-poke dropzone" style="display:none">
                     </div>
                 </div>
                 <hr>
@@ -996,6 +1001,10 @@
                     <input type="checkbox" id="auto-detect-doubles" />
                     <label for="auto-detect-doubles">Auto-detect doubles</label>
                 </div>
+                <div class="gen-specific g8 g9" style="margin: 0 auto 5px; text-align: center; font-size: 0.85em;">
+                    <input type="checkbox" id="enable-team-slots" />
+                    <label for="enable-team-slots">Enable team slots for doubles</label>
+                </div>
                 <div aria-labelledby="selectTerrainInstruction" class="gen-specific g6 g7 g8 g9" role="group" title="Select the current terrain.">
                     <span class="visually-hidden" id="selectTerrainInstruction">Select the current terrain.</span>
                     <input class="visually-hidden terrain-trigger calc-trigger" type="checkbox" name="terrain" value="Electric" id="electric" /><label class="btn btn-xxxwide btn-left" for="electric">Electric Terrain</label>
@@ -1348,10 +1357,15 @@
             <fieldset class="poke-info" id="opp-trainer-mons">
                 <legend align="center"> OPPOSING TEAM</legend>
                 <div class="trainer-poks">
-                    <div class="trainer-pok-list-opposing">
-                        <div class="trainer-pok-container"> 
+                    <div class="slot-label" id="opp-slot-1-label" style="display:none">Slot 1</div>
+                    <div class="trainer-pok-list-opposing opp-slot-dropzone">
+                        <div class="trainer-pok-container">
                             <img class="trainer-pok-opposing" src="https://raw.githubusercontent.com/May8th1995/sprites/master/charizard.png" title="Focus Blast 120">
                         </div>
+                    </div>
+                    <hr class="slot-hr" id="opp-slot-hr" style="display:none">
+                    <div class="slot-label" id="opp-slot-2-label" style="display:none">Slot 2</div>
+                    <div id="opp-slot-2" class="opp-slot-dropzone" style="display:none">
                     </div>
                 </div>
                 <!--hr>
