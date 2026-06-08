@@ -576,36 +576,15 @@ $(".set-selector").change(function () {
 			if (!isNaN(trainerIndex)) localStorage.setItem("lasttimetrainer", trainerIndex);
 		}
 
-		var trpok_html = ""
-		for (i in next_poks) {
-			if (next_poks[i][0].includes($('input.opposing').val())) {
-				continue
-			}
-			var pok_name = next_poks[i].split("]")[1].split(" (")[0]
-			if (pok_name == "Zygarde-10%") {
-				pok_name = "Zygarde-10%25"
-			}
-			if (pok_name.includes("Vivillon")) {
-				pok_name = "Vivillon";
-			}
-			
-			// this ruined my day
-			if (pok_name.includes("-Mega")) {
-				var base_name = pok_name.split("-Mega")[0]
-				var mega_data_id = CURRENT_TRAINER_POKS[i].split("]")[1]
-				trpok_html += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${base_name}.png" data-id="${mega_data_id}" data-base-name="${base_name}" title="${next_poks[i]}, ${next_poks[i]} BP">`
-			}
-			var pok = `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${pok_name}.png" data-id="${CURRENT_TRAINER_POKS[i].split("]")[1]}" title="${next_poks[i]}, ${next_poks[i]} BP">`
-			trpok_html += pok
-		}
+		var metadata = typeof TRAINER_METADATA !== 'undefined' ? TRAINER_METADATA[window.CURRENT_TRAINER] : null;
+		var slotHtml = buildOppTrainerSlotHtml(next_poks, $('input.opposing').val(), metadata);
 		if (trainerChanged) {
-			$('.trainer-pok-list-opposing').html(trpok_html);
-			$('#opp-slot-2').empty();
-			if ($('#enable-team-slots').is(':checked') && $("input:radio[name='format']:checked").val() === 'Doubles') {
-				setOppPoksDraggable(true);
-			}
+			$('.trainer-pok-list-opposing').html(slotHtml.slot1);
+			$('#opp-slot-2').html(slotHtml.slot2);
+			updateOppPoksDraggability();
 		}
 		colorCodeUpdateOpposing();
+		updateDoublesTypeLabel();
 	} else {
 		topPokemonIcon(fullSetName, $("#p1mon")[0])
 	}
@@ -1950,17 +1929,24 @@ function selectTrainer(value) {
 	}
 }
 
+function trainerIndexes() {
+	if (!CURRENT_TRAINER_POKS || !CURRENT_TRAINER_POKS.length) return null;
+	var indexes = CURRENT_TRAINER_POKS.map(function(p) {
+		return parseInt(p.split("[")[1].split("]")[0]);
+	}).filter(function(n) { return !isNaN(n); });
+	return indexes.length ? indexes : null;
+}
+
 function nextTrainer() {
-	var string = ($(".trainer-pok-list-opposing")).html() + ($('#opp-slot-2').html() || "");
-	var initialSplit = string.split("[");
-	var value = parseInt(initialSplit[initialSplit.length - 2].split("]")[0]) + 1;
-	selectTrainer(value);
+	var indexes = trainerIndexes();
+	if (!indexes) return;
+	selectTrainer(Math.max.apply(null, indexes) + 1);
 }
 
 function previousTrainer() {
-	var string = ($(".trainer-pok-list-opposing")).html() + ($('#opp-slot-2').html() || "");
-	var value = parseInt(string.split("]")[0].split("[")[1]) - 1;
-	selectTrainer(value);
+	var indexes = trainerIndexes();
+	if (!indexes) return;
+	selectTrainer(Math.min.apply(null, indexes) - 1);
 }
 
 function resetTrainer() {
@@ -2421,33 +2407,47 @@ function updateSingleDoublesIcon() {
 	updateTeamSlotsVisibility();
 }
 
-function repopulateOppTrainerPoks() {
-	if (!CURRENT_TRAINER_POKS || !CURRENT_TRAINER_POKS.length) return;
-	var next_poks = CURRENT_TRAINER_POKS.sort(sortmons);
-	var trpok_html = "";
+function buildOppTrainerSlotHtml(next_poks, opposingVal, metadata) {
+	var teamSlots = metadata && metadata.teamSlots ? metadata.teamSlots : null;
+	var slotsVisible = $("input:radio[name='format']:checked").val() === 'Doubles' && $('#enable-team-slots').is(':checked');
+	var useSlots = $('#auto-pseudo-true-doubles').is(':checked') && teamSlots && slotsVisible;
+	var slot1 = "", slot2 = "";
+
 	for (var i in next_poks) {
-		if (next_poks[i][0].includes($('input.opposing').val())) {
-			continue;
-		}
-		var pok_name = next_poks[i].split("]")[1].split(" (")[0];
-		if (pok_name == "Zygarde-10%") {
-			pok_name = "Zygarde-10%25";
-		}
-		if (pok_name.includes("Vivillon")) {
-			pok_name = "Vivillon";
-		}
+		if (next_poks[i][0].includes(opposingVal)) continue;
+
+		var raw_name = next_poks[i].split("]")[1].split(" (")[0];
+		var pok_name = raw_name;
+		if (pok_name === "Zygarde-10%") pok_name = "Zygarde-10%25";
+		if (pok_name.includes("Vivillon")) pok_name = "Vivillon";
+
+		var imgHtml = "";
 		// this ruined my day
 		if (pok_name.includes("-Mega")) {
 			var base_name = pok_name.split("-Mega")[0];
 			var mega_data_id = CURRENT_TRAINER_POKS[i].split("]")[1];
-			trpok_html += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${base_name}.png" data-id="${mega_data_id}" data-base-name="${base_name}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
+			imgHtml += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${base_name}.png" data-id="${mega_data_id}" data-base-name="${base_name}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
 		}
-		var pok = `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${pok_name}.png" data-id="${CURRENT_TRAINER_POKS[i].split("]")[1]}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
-		trpok_html += pok;
+		imgHtml += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${pok_name}.png" data-id="${CURRENT_TRAINER_POKS[i].split("]")[1]}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
+
+		if (useSlots && teamSlots[raw_name] === 2) {
+			slot2 += imgHtml;
+		} else {
+			slot1 += imgHtml;
+		}
 	}
-	$('.trainer-pok-list-opposing').html(trpok_html);
-	$('#opp-slot-2').empty();
+	return { slot1: slot1, slot2: slot2 };
+}
+
+function repopulateOppTrainerPoks() {
+	if (!CURRENT_TRAINER_POKS || !CURRENT_TRAINER_POKS.length) return;
+	var metadata = typeof TRAINER_METADATA !== 'undefined' ? TRAINER_METADATA[window.CURRENT_TRAINER] : null;
+	var next_poks = CURRENT_TRAINER_POKS.sort(sortmons);
+	var html = buildOppTrainerSlotHtml(next_poks, $('input.opposing').val(), metadata);
+	$('.trainer-pok-list-opposing').html(html.slot1);
+	$('#opp-slot-2').html(html.slot2);
 	colorCodeUpdateOpposing();
+	updateOppPoksDraggability();
 }
 
 function setOppPoksDraggable(draggable) {
@@ -2462,6 +2462,42 @@ function setOppPoksDraggable(draggable) {
 	}
 }
 
+function lockFirstPokInContainer(container) {
+	if (!container) return;
+	var imgs = container.querySelectorAll('img.trainer-pok.right-side');
+	if (!imgs.length) return;
+	imgs[0].draggable = false;
+	imgs[0].removeEventListener('dragstart', dragstart_handler);
+	// If first img is a base form (data-base-name set), its paired mega is next — lock it too
+	if (imgs[0].getAttribute('data-base-name') && imgs.length > 1) {
+		imgs[1].draggable = false;
+		imgs[1].removeEventListener('dragstart', dragstart_handler);
+	}
+}
+
+function updateOppPoksDraggability() {
+	var isDoubles = $("input:radio[name='format']:checked").val() === 'Doubles';
+	var autoPseudoTrue = $('#auto-pseudo-true-doubles').is(':checked');
+	var teamSlotsEnabled = $('#enable-team-slots').is(':checked');
+
+	setOppPoksDraggable(false);
+
+	if (!isDoubles) return;
+
+	if (autoPseudoTrue) {
+		var metadata = typeof TRAINER_METADATA !== 'undefined' ? TRAINER_METADATA[window.CURRENT_TRAINER] : null;
+		if (!metadata || metadata.battleType !== 'true') return; // pseudo or unknown: nothing draggable
+		// True double: all draggable except first in each slot
+		setOppPoksDraggable(true);
+		lockFirstPokInContainer(document.querySelector('.trainer-pok-list-opposing'));
+		lockFirstPokInContainer(document.getElementById('opp-slot-2'));
+	} else if (teamSlotsEnabled) {
+		// Slots on, auto mode off: all draggable except first in slot 1
+		setOppPoksDraggable(true);
+		lockFirstPokInContainer(document.querySelector('.trainer-pok-list-opposing'));
+	}
+}
+
 function updateTeamSlotsVisibility() {
 	var isDoubles = $("input:radio[name='format']:checked").val() === 'Doubles';
 	var slotsEnabled = $('#enable-team-slots').is(':checked');
@@ -2472,13 +2508,56 @@ function updateTeamSlotsVisibility() {
 	$('#opp-slot-1-label, #opp-slot-hr, #opp-slot-2-label').toggle(showSlots);
 	$('#opp-slot-2').toggle(showSlots);
 
-	setOppPoksDraggable(showSlots);
-
 	if (!showSlots) {
 		$('#team-slot-2 .trainer-pok').each(function () {
 			$('#team-poke-list').append(this);
 		});
-		repopulateOppTrainerPoks();
+	}
+
+	repopulateOppTrainerPoks();
+	updateOppPoksDraggability();
+	updateDoublesTypeLabel();
+}
+
+function updateDoublesTypeLabel() {
+	var isEnabled = $('#auto-pseudo-true-doubles').is(':checked');
+	var isDoubles = $("input:radio[name='format']:checked").val() === 'Doubles';
+	if (isEnabled && isDoubles) {
+		var metadata = typeof TRAINER_METADATA !== 'undefined' ? TRAINER_METADATA[window.CURRENT_TRAINER] : null;
+		var label = '';
+		if (metadata && metadata.isDouble && metadata.battleType === 'true') label = '(True Double)';
+		else if (metadata && metadata.isDouble && metadata.battleType === 'pseudo') label = '(Pseudo Double)';
+		if (label) {
+			$('#doubles-type-label').text(label).show();
+		} else {
+			$('#doubles-type-label').hide().text('');
+		}
+	} else {
+		$('#doubles-type-label').hide().text('');
+	}
+}
+
+function runAutoDetectDoubles() {
+	var metadata = typeof TRAINER_METADATA !== 'undefined' ? TRAINER_METADATA[window.CURRENT_TRAINER] : null;
+	var shouldBeDoubles = !!(metadata && metadata.isDouble);
+	if (shouldBeDoubles) {
+		$("#doubles-format").prop("checked", true).trigger("change");
+	} else {
+		$("#singles-format").prop("checked", true).trigger("change");
+	}
+	updateSingleDoublesIcon();
+}
+
+function updateAutoPseudoTrueDoubles() {
+	var isEnabled = $('#auto-pseudo-true-doubles').is(':checked');
+	if (isEnabled) {
+		$('#auto-detect-doubles').prop('checked', true).prop('disabled', true);
+		$('#enable-team-slots').prop('checked', true).prop('disabled', true);
+		runAutoDetectDoubles();
+	} else {
+		$('#auto-detect-doubles').prop('disabled', false);
+		$('#enable-team-slots').prop('disabled', false);
+		updateTeamSlotsVisibility();
 	}
 }
 
@@ -2613,7 +2692,12 @@ $(document).ready(function () {
 		localStorage.setItem('enableTeamSlots', this.checked);
 		updateTeamSlotsVisibility();
 	});
-	updateTeamSlotsVisibility();
+	$('#auto-pseudo-true-doubles').prop('checked', localStorage.getItem('autoPseudoTrueDoubles') === 'true');
+	$('#auto-pseudo-true-doubles').change(function () {
+		localStorage.setItem('autoPseudoTrueDoubles', this.checked);
+		updateAutoPseudoTrueDoubles();
+	});
+	updateAutoPseudoTrueDoubles();
 	for (let dropzone of document.getElementsByClassName("dropzone")) {
 		dropzone.ondragenter=handleDragEnter;
 		dropzone.ondragleave=handleDragLeave;
