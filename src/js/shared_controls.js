@@ -1946,7 +1946,25 @@ function nextTrainer() {
 function previousTrainer() {
 	var indexes = trainerIndexes();
 	if (!indexes) return;
-	selectTrainer(Math.min.apply(null, indexes) - 1);
+	var lastPokOfPrevTrainer = Math.min.apply(null, indexes) - 1;
+	var trainerName = null;
+	for (var i = 0; i < TR_NAMES.length; i++) {
+		var idx = parseInt(TR_NAMES[i].split("[")[1].split("]")[0]);
+		if (idx === lastPokOfPrevTrainer) {
+			trainerName = extractTrainerName(TR_NAMES[i]);
+			break;
+		}
+	}
+	if (!trainerName) return;
+	var firstIndex = Infinity;
+	for (var i = 0; i < TR_NAMES.length; i++) {
+		if (TR_NAMES[i].includes(`(${trainerName})`)) {
+			var idx = parseInt(TR_NAMES[i].split("[")[1].split("]")[0]);
+			if (idx < firstIndex) firstIndex = idx;
+		}
+	}
+	if (firstIndex === Infinity) return;
+	selectTrainer(firstIndex);
 }
 
 function resetTrainer() {
