@@ -9,3 +9,6 @@ dist/
 scripts/__pycache__
 .vscode
 .env
+
+# intermediary data for double slots conversion
+scripts/data/trainerMetadata.json
