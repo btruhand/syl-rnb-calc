@@ -568,14 +568,7 @@ $(".set-selector").change(function () {
 		CURRENT_TRAINER_POKS = get_trainer_poks(fullSetName);
 		var trainerChanged = window.CURRENT_TRAINER !== prevTrainer;
 		if ($("#auto-detect-doubles").is(":checked")) {
-			var metadata = (typeof TRAINER_METADATA !== 'undefined') ? TRAINER_METADATA[window.CURRENT_TRAINER] : null;
-			var shouldBeDoubles = !!(metadata && metadata.isDouble);
-			if (shouldBeDoubles) {
-				$("#doubles-format").prop("checked", true).trigger("change");
-			} else {
-				$("#singles-format").prop("checked", true).trigger("change");
-			}
-			updateSingleDoublesIcon();
+			applyAutoDetectDoubles();
 		}
 		var next_poks = CURRENT_TRAINER_POKS.sort(sortmons);
 		if (!window.pageInitializing) {
@@ -2407,6 +2400,17 @@ function collapseArrow(arrow){
 	}
 }
 
+function applyAutoDetectDoubles() {
+	var metadata = (typeof TRAINER_METADATA !== 'undefined') ? TRAINER_METADATA[window.CURRENT_TRAINER] : null;
+	var shouldBeDoubles = !!(metadata && metadata.isDouble);
+	if (shouldBeDoubles) {
+		$("#doubles-format").prop("checked", true).trigger("change");
+	} else {
+		$("#singles-format").prop("checked", true).trigger("change");
+	}
+	updateSingleDoublesIcon();
+}
+
 function updateSingleDoublesIcon() {
 	const isDoubles = $("#doubles-format").is(':checked');
 	if (isDoubles) {
@@ -2600,6 +2604,9 @@ $(document).ready(function () {
 	$('#auto-detect-doubles').prop('checked', localStorage.getItem('autoDetectDoubles') === 'true');
 	$('#auto-detect-doubles').change(function () {
 		localStorage.setItem('autoDetectDoubles', this.checked);
+		if (this.checked) {
+			applyAutoDetectDoubles();
+		}
 	});
 	$('#enable-team-slots').prop('checked', localStorage.getItem('enableTeamSlots') === 'true');
 	$('#enable-team-slots').change(function () {
