@@ -52,7 +52,7 @@ var TRAINER_METADATA = {
 	"Magma Grunt Magma Hideout #7 & Grunt 8": { isDouble: true, battleType: "pseudo", teamSlots: { "Donphan": 1, "Miltank": 1, "Ninetales": 1, "Arcanine": 2, "Exeggutor": 2, "Jumpluff": 2 } },
 	"Magma Grunt Mt Chimney #2 & Grunt One": { isDouble: true, battleType: "pseudo", teamSlots: { "Accelgor": 1, "Sawk": 1, "Indeedee-F": 2, "Meowstic-F": 2 } },
 	"Ninja Boy Jonas & Fredrick": { isDouble: true, battleType: "pseudo", teamSlots: { "Donphan": 1, "Sneasler": 1, "Togekiss": 1, "Decidueye": 2, "Mr. Rime": 2, "Sceptile": 2 } },
-	"Ninja Boy Takashi & Dayton": { isDouble: true, battleType: "pseudo", teamSlots: { "Gardevoir": 1, "Oranguru": 1, "Shiftry": 2, "Wailord": 2 } },
+	"Ninja Boy Takashi & Dayton": { isDouble: true, battleType: "pseudo", teamSlots: { "Shiftry": 1, "Wailord": 1, "Gardevoir": 2, "Oranguru": 2 } },
 	"Ninja Boy Yasu & Fabian": { isDouble: true, battleType: "pseudo", teamSlots: { "Banette": 1, "Castform": 1, "Jolteon": 2, "Obstagoon": 2 } },
 	"Parasol Lady Madeline & Camper Lawrence": { isDouble: true, battleType: "pseudo", teamSlots: { "Marowak-Alola": 1, "Raichu": 1, "Rhyperior": 1, "Staraptor": 2, "Gyarados": 2, "Lumineon": 2 } },
 	"Pokéfan Isabel & Kaleb": { isDouble: true, battleType: "pseudo", teamSlots: { "Lycanroc-Dusk": 1, "Victreebel": 1, "Kangaskhan": 2, "Fearow": 2 } },
