@@ -225,7 +225,7 @@ function calculationsColors(p1info, p2, p1NameOverride, swapSides) {
 		var p2info = $("#p2");
 		var p2 = createPokemon(p2info);
 	}
-	var p1 = createPokemon(p1info, p1NameOverride);
+	var p1 = createPokemon(p1info, p1NameOverride, swapSides ? $("#p2") : $("#p1"));
 	var p1field = createField();
 	if (swapSides) p1field.swap();
 	var p2field = p1field.clone().swap();

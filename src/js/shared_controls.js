@@ -945,7 +945,7 @@ function correctHiddenPower(pokemon) {
 	return pokemon;
 }
 
-function createPokemon(pokeInfo, nameOverride) {
+function createPokemon(pokeInfo, nameOverride, critSource) {
 	if (typeof pokeInfo === "string") { // in this case, pokeInfo is the id of an individual setOptions value whose moveset's tier matches the selected tier(s)
 		var name = pokeInfo.substring(0, pokeInfo.indexOf(" ("));
 		var setName = pokeInfo.substring(pokeInfo.indexOf("(") + 1, pokeInfo.lastIndexOf(")"));
@@ -975,7 +975,7 @@ function createPokemon(pokeInfo, nameOverride) {
 		var pokemonMoves = [];
 		for (var i = 0; i < 4; i++) {
 			var moveName = moveNames[i];
-			var isCrit = $('.move-crit')[i].checked;
+			var isCrit = critSource ? critSource.find('.move-crit').eq(i).prop('checked') : false;
 			pokemonMoves.push(new calc.Move(gen, moves[moveName] ? moveName : "(No Move)", { ability: ability, item: item, isCrit: isCrit, }));
 		}
 
