@@ -83,5 +83,6 @@ const BJIR_CHANGELOG = [
 		0,
 		"Add auto-detect doubles optional feature; Add optional team slots support for double battles",
 	),
-	new ChangelogLine(1,6,0,"Add 'Auto-detect pseudo/true doubles' optional function")
+	new ChangelogLine(1,6,0,"Add 'Auto-detect pseudo/true doubles' optional function"),
+	new ChangelogLine(1, 6, 1,"Fix crit state for moves incorrectly obtained from player's Pokémon instead of opposing side when calculating opposing OHKO color")
 ];
