@@ -12,3 +12,9 @@ scripts/__pycache__
 
 # intermediary data for double slots conversion
 scripts/data/trainerMetadata.json
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
