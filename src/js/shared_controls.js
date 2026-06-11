@@ -1900,6 +1900,9 @@ $(document).on('click', '.right-side', function () {
 		var mbaKey = Object.keys(MEGA_BASE_ABILITIES).find(k => trainerName.includes(k)) || trainerName;
 		var baseAbility = (MEGA_BASE_ABILITIES[mbaKey] && MEGA_BASE_ABILITIES[mbaKey][baseName])
 			|| (basePokemon && basePokemon.ab)
+			// Ash-Greninja's base form shares the set's ability (Battle Bond), unlike megas
+			// which carry a distinct pre-mega ability — keep the already-loaded set ability.
+			|| pokeObj.find(".ability").val()
 			|| "";
 		pokeObj.find("select.forme").val(baseName);
 		pokeObj.find(".ability").val(baseAbility).keyup();
@@ -2471,6 +2474,10 @@ function buildOppTrainerSlotHtml(next_poks, opposingVal, metadata) {
 			var base_name = pok_name.split("-Mega")[0];
 			var mega_data_id = CURRENT_TRAINER_POKS[i].split("]")[1];
 			imgHtml += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${base_name}.png" data-id="${mega_data_id}" data-base-name="${base_name}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
+		} else if (pok_name.includes("-Ash")) {
+			var ash_base_name = pok_name.split("-Ash")[0];
+			var ash_data_id = CURRENT_TRAINER_POKS[i].split("]")[1];
+			imgHtml += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${ash_base_name}.png" data-id="${ash_data_id}" data-base-name="${ash_base_name}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
 		}
 		imgHtml += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${pok_name}.png" data-id="${CURRENT_TRAINER_POKS[i].split("]")[1]}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
 
