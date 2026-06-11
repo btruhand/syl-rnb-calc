@@ -84,5 +84,6 @@ const BJIR_CHANGELOG = [
 		"Add auto-detect doubles optional feature; Add optional team slots support for double battles",
 	),
 	new ChangelogLine(1,6,0,"Add 'Auto-detect pseudo/true doubles' optional function"),
-	new ChangelogLine(1, 6, 1,"Fix crit state for moves incorrectly obtained from player's Pokémon instead of opposing side when calculating opposing OHKO color")
+	new ChangelogLine(1, 6, 1,"Fix crit state for moves incorrectly obtained from player's Pokémon instead of opposing side when calculating opposing OHKO color"),
+	new ChangelogLine(1,6,2,"Fix Fisherman Darian and Phil separated as different fights. Also combine them as one result in the search bar")
 ];
