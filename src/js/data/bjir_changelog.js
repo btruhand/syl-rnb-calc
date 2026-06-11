@@ -87,4 +87,5 @@ const BJIR_CHANGELOG = [
 	new ChangelogLine(1, 6, 1,"Fix crit state for moves incorrectly obtained from player's Pokémon instead of opposing side when calculating opposing OHKO color"),
 	new ChangelogLine(1,6,2,"Fix Fisherman Darian and Phil separated as different fights. Also combine them as one result in the search bar"),
 	new ChangelogLine(1,7,0,"Add 'Reset field on trainer change' option"),
+	new ChangelogLine(1, 7, 1,"Add base form Pokémon for Greninja-Ash"),
 ];
