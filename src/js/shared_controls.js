@@ -1536,7 +1536,8 @@ function loadDefaultLists() {
                 var seenBestId = {};
                 for (var r = 0; r < results.length; r++) {
                     var opt = results[r];
-                    var setNameUpper = opt.set ? opt.set.toUpperCase() : "";
+                    // Trim so leading-space duplicate keys (e.g. " Fisherman Darian") collapse into one search result.
+                    var setNameUpper = opt.set ? opt.set.toUpperCase().trim() : "";
                     if (!opt.set || setNameUpper === "BLANK SET") continue; // don't dedupe headers or Blank Set
                     var matchesSet = tokens.every(function (term) {
                         return setNameUpper.indexOf(term) === 0 || setNameUpper.indexOf("-" + term) >= 0 || setNameUpper.indexOf(" " + term) >= 0;
@@ -1558,7 +1559,7 @@ function loadDefaultLists() {
                     for (var r2 = 0; r2 < results.length; r2++) {
                         var opt2 = results[r2];
                         if (opt2.set) {
-                            var setUpper = opt2.set.toUpperCase();
+                            var setUpper = opt2.set.toUpperCase().trim();
                             if (bySetBest[setUpper]) {
                                 var bestOpt = bySetBest[setUpper].option;
                                 if (!chosenIds[setUpper]) {
@@ -1679,11 +1680,14 @@ function extractTrainerName(monAndTrainer) {
 }
 
 function get_trainer_poks(trainer_name) {
-	var true_name = extractTrainerName(trainer_name);
+	// Duplicate mons of the same species under one trainer are keyed with leading
+	// spaces in the setdex (e.g. "Fisherman Darian" / " Fisherman Darian") so the
+	// keys stay unique. Trim when grouping so they all land in the same fight.
+	var true_name = extractTrainerName(trainer_name).trim();
 	window.CURRENT_TRAINER = true_name;
 	var matches = []
 	for (i in TR_NAMES) {
-		if (TR_NAMES[i].includes(`(${true_name})`)) {
+		if (extractTrainerName(TR_NAMES[i]).trim() === true_name) {
 			matches.push(TR_NAMES[i])
 		}
 	}
@@ -1951,14 +1955,14 @@ function previousTrainer() {
 	for (var i = 0; i < TR_NAMES.length; i++) {
 		var idx = parseInt(TR_NAMES[i].split("[")[1].split("]")[0]);
 		if (idx === lastPokOfPrevTrainer) {
-			trainerName = extractTrainerName(TR_NAMES[i]);
+			trainerName = extractTrainerName(TR_NAMES[i]).trim();
 			break;
 		}
 	}
 	if (!trainerName) return;
 	var firstIndex = Infinity;
 	for (var i = 0; i < TR_NAMES.length; i++) {
-		if (TR_NAMES[i].includes(`(${trainerName})`)) {
+		if (extractTrainerName(TR_NAMES[i]).trim() === trainerName) {
 			var idx = parseInt(TR_NAMES[i].split("[")[1].split("]")[0]);
 			if (idx < firstIndex) firstIndex = idx;
 		}
