@@ -558,6 +558,25 @@ function sortmons(a, b) {
 	return parseInt(a.split("[")[1].split("]")[0]) - parseInt(b.split("[")[1].split("]")[0])
 }
 
+// reset every field-box value (weather, terrain, hazards, screens, rooms, etc.) to its default.
+// the Single/Double picker is left alone when auto-detect doubles is on so that choice keeps
+// deferring to auto-detect; otherwise it resets to Singles like any other field value.
+function resetFieldOnTrainerChange() {
+	var autoDetect = $("#auto-detect-doubles").is(":checked");
+	$("#fieldInfo .calc-trigger").each(function () {
+		if ($(this).attr("name") === "format") return;
+		if (this.type === "checkbox") {
+			this.checked = false;
+		} else if (this.type === "radio") {
+			this.checked = this.defaultChecked;
+		}
+	});
+	if (!autoDetect) {
+		$("#singles-format").prop("checked", true).trigger("change");
+		updateSingleDoublesIcon();
+	}
+}
+
 // auto-update set details on select
 $(".set-selector").change(function () {
 	window.NO_CALC = true;
@@ -569,6 +588,9 @@ $(".set-selector").change(function () {
 		var trainerChanged = window.CURRENT_TRAINER !== prevTrainer;
 		if ($("#auto-detect-doubles").is(":checked")) {
 			applyAutoDetectDoubles();
+		}
+		if (trainerChanged && $("#reset-field-on-trainer-change").is(":checked")) {
+			resetFieldOnTrainerChange();
 		}
 		var next_poks = CURRENT_TRAINER_POKS.sort(sortmons);
 		if (!window.pageInitializing) {
@@ -2718,6 +2740,10 @@ $(document).ready(function () {
 	$('#auto-pseudo-true-doubles').change(function () {
 		localStorage.setItem('autoPseudoTrueDoubles', this.checked);
 		updateAutoPseudoTrueDoubles();
+	});
+	$('#reset-field-on-trainer-change').prop('checked', localStorage.getItem('resetFieldOnTrainerChange') === 'true');
+	$('#reset-field-on-trainer-change').change(function () {
+		localStorage.setItem('resetFieldOnTrainerChange', this.checked);
 	});
 	updateAutoPseudoTrueDoubles();
 	for (let dropzone of document.getElementsByClassName("dropzone")) {
