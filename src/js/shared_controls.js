@@ -586,7 +586,7 @@ $(".set-selector").change(function () {
 		var prevTrainer = window.CURRENT_TRAINER;
 		CURRENT_TRAINER_POKS = get_trainer_poks(fullSetName);
 		var trainerChanged = window.CURRENT_TRAINER !== prevTrainer;
-		if ($("#auto-detect-doubles").is(":checked")) {
+		if (trainerChanged && $("#auto-detect-doubles").is(":checked")) {
 			applyAutoDetectDoubles();
 		}
 		if (trainerChanged && $("#reset-field-on-trainer-change").is(":checked")) {
