@@ -593,7 +593,10 @@ $(".set-selector").change(function () {
 			resetFieldOnTrainerChange();
 		}
 		var next_poks = CURRENT_TRAINER_POKS.sort(sortmons);
-		if (!window.pageInitializing) {
+		// Imported/custom sets live in setdex (so they're searchable) but not in
+		// TR_NAMES, so they have no trainer poks. Guard against the empty list so the
+		// handler doesn't throw here and skip populating the mon's stats below.
+		if (!window.pageInitializing && next_poks.length) {
 			var trainerIndex = parseInt(next_poks[0].split("[")[1].split("]")[0]);
 			if (!isNaN(trainerIndex)) localStorage.setItem("lasttimetrainer", trainerIndex);
 		}
