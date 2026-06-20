@@ -1691,11 +1691,10 @@ function getSrcImgPokemon(poke) {
 	if (!poke) {
 		return
 	}
-	if (poke.name == "Aegislash-Shield") {
-		return `https://raw.githubusercontent.com/May8th1995/sprites/master/Aegislash.png`
-	} else {
-		return `https://raw.githubusercontent.com/May8th1995/sprites/master/${poke.name}.png`
-	}
+	// Aegislash-Shield shares Aegislash's sprite. Otherwise URL-encode the name so chars like
+	// '%' (Zygarde-10%), ':' (Type: Null) and spaces don't break the request.
+	var spriteName = poke.name == "Aegislash-Shield" ? "Aegislash" : encodeURIComponent(poke.name);
+	return `https://raw.githubusercontent.com/May8th1995/sprites/master/${spriteName}.png`
 }
 
 function extractTrainerName(monAndTrainer) {
@@ -1974,10 +1973,9 @@ $(document).on('click', '#copy-player-to-opp', function () {
 	// a pre-mega base sprite that mega-evolves), a copied mega/Ash form should appear as that
 	// form itself — so no data-base-name and no separate base sprite.
 	var pokName = name;
-	if (pokName === "Zygarde-10%") pokName = "Zygarde-10%25";
 	if (pokName.includes("Vivillon")) pokName = "Vivillon";
 	var spriteBase = "https://raw.githubusercontent.com/May8th1995/sprites/master/";
-	var imgHtml = `<img class="trainer-pok right-side" src="${spriteBase}${pokName}.png" data-id="${dataId}" title="[0]${dataId}">`;
+	var imgHtml = `<img class="trainer-pok right-side" src="${spriteBase}${encodeURIComponent(pokName)}.png" data-id="${dataId}" title="[0]${dataId}">`;
 
 	$('.trainer-pok-list-opposing').append(imgHtml);
 	colorCodeUpdateOpposing();
@@ -2536,7 +2534,6 @@ function buildOppTrainerSlotHtml(next_poks, opposingVal, metadata) {
 
 		var raw_name = next_poks[i].split("]")[1].split(" (")[0];
 		var pok_name = raw_name;
-		if (pok_name === "Zygarde-10%") pok_name = "Zygarde-10%25";
 		if (pok_name.includes("Vivillon")) pok_name = "Vivillon";
 
 		var imgHtml = "";
@@ -2544,13 +2541,13 @@ function buildOppTrainerSlotHtml(next_poks, opposingVal, metadata) {
 		if (pok_name.includes("-Mega")) {
 			var base_name = pok_name.split("-Mega")[0];
 			var mega_data_id = CURRENT_TRAINER_POKS[i].split("]")[1];
-			imgHtml += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${base_name}.png" data-id="${mega_data_id}" data-base-name="${base_name}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
+			imgHtml += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${encodeURIComponent(base_name)}.png" data-id="${mega_data_id}" data-base-name="${base_name}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
 		} else if (pok_name.includes("-Ash")) {
 			var ash_base_name = pok_name.split("-Ash")[0];
 			var ash_data_id = CURRENT_TRAINER_POKS[i].split("]")[1];
-			imgHtml += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${ash_base_name}.png" data-id="${ash_data_id}" data-base-name="${ash_base_name}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
+			imgHtml += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${encodeURIComponent(ash_base_name)}.png" data-id="${ash_data_id}" data-base-name="${ash_base_name}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
 		}
-		imgHtml += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${pok_name}.png" data-id="${CURRENT_TRAINER_POKS[i].split("]")[1]}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
+		imgHtml += `<img class="trainer-pok right-side" src="https://raw.githubusercontent.com/May8th1995/sprites/master/${encodeURIComponent(pok_name)}.png" data-id="${CURRENT_TRAINER_POKS[i].split("]")[1]}" title="${next_poks[i]}, ${next_poks[i]} BP">`;
 
 		if (useSlots && teamSlots[raw_name] === 2) {
 			slot2 += imgHtml;
