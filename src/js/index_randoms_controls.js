@@ -519,7 +519,7 @@ $(document).ready(function () {
 	// Filters mons in players sections based on the search input.
 	$("#search").on('input keyup change', function () {
 		var q = ($(this).val() || '').trim().toLowerCase();
-		var $targets = $('#team-poke-list img.trainer-pok, #box-poke-list img.trainer-pok, #box-poke-list2 img.trainer-pok, #trash-box img.trainer-pok');
+		var $targets = $('#team-poke-list img.trainer-pok, #team-slot-2 img.trainer-pok, #box-poke-list img.trainer-pok, #box-poke-list2 img.trainer-pok, #trash-box img.trainer-pok');
 
 		// If targets aren't loaded return
 		if ($targets.length === 0) {
