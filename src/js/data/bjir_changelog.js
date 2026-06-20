@@ -91,4 +91,5 @@ const BJIR_CHANGELOG = [
 	new ChangelogLine(1, 7, 2,"Fix team slots resetting on auto-detected true doubles when opposing pokemon is clicked. Fix selected player pokemon's information when selected in opposing team dropdowm not being shown properly"),
 	new ChangelogLine(1, 7, 3,"Show color coding and speed border if turned on without having to open color coding options"),
 	new ChangelogLine(1, 8, 0,"Add 'Copy your mon to enemy team' functionality"),
+	new ChangelogLine(1, 8, 1,"Fix Zygarde-10% top sprite not shown; Allow copied pokemon to be draggable in doubles when team slots option is on"),
 ];
