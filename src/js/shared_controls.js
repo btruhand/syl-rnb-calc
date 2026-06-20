@@ -1914,6 +1914,76 @@ $(document).on('click', '.right-side', function () {
 	colorCodeUpdateOpposingTop();
 })
 
+// Copy Pokemon 1's currently-configured set (live item/ability/moves/EVs/IVs/nature/tera)
+// into the opposing team grid as a session-only sprite. The set is registered in the
+// in-memory `setdex` (not persisted to SETDEX_* / localStorage) so the sprite resolves on
+// click and in calcs, and is wiped on reload or trainer change like any non-roster mon.
+$(document).on('click', '#copy-player-to-opp', function () {
+	var src = $("#p1");
+	var setName = src.find("input.set-selector").val();
+	if (!setName) { alert("Select a Pokémon 1 set to copy first."); return; }
+
+	// Resolve the live species name, forme/mega-aware (mirrors createPokemon).
+	var name;
+	if (setName.indexOf("(") === -1) {
+		name = setName;
+	} else {
+		var pokemonName = setName.substring(0, setName.indexOf(" ("));
+		if (pokemonName.includes("Vivillon")) pokemonName = "Vivillon";
+		var species = pokedex[pokemonName];
+		name = (species && (species.otherFormes || (species.baseSpecies && species.baseSpecies !== pokemonName)))
+			? src.find(".forme").val() : pokemonName;
+	}
+
+	// Read the live set straight from the #p1 fields (legacy-keyed, matching setdex shape).
+	var evs = {}, ivs = {};
+	for (var i = 0; i < LEGACY_STATS[gen].length; i++) {
+		var ls = LEGACY_STATS[gen][i];
+		evs[ls] = ~~src.find("." + ls + " .evs").val();
+		ivs[ls] = ~~src.find("." + ls + " .ivs").val();
+	}
+	var moves = [];
+	for (i = 0; i < 4; i++) {
+		moves.push(src.find(".move" + (i + 1) + " select.move-selector").val() || "(No Move)");
+	}
+	var setObj = {
+		level: ~~src.find(".level").val() || 100,
+		nature: src.find(".nature").val(),
+		ability: src.find(".ability").val(),
+		item: src.find(".item").val(),
+		teraType: src.find(".teraType").val(),
+		evs: evs,
+		ivs: ivs,
+		moves: moves
+	};
+
+	// Key the set by the current trainer so the sprite's parsed trainer name still matches
+	// the loaded roster — clicking the copy then isn't seen as a trainer change, so the grid
+	// isn't rebuilt/wiped. On collision (same species copied again, or the real trainer
+	// already runs it) append trailing spaces: that keeps the setdex key unique while the
+	// trimmed name still resolves to the trainer, mirroring the leading-space convention
+	// get_trainer_poks already uses for duplicate mons.
+	var trainer = window.CURRENT_TRAINER || "Copied";
+	var setKey = trainer;
+	if (!setdex[name]) setdex[name] = {};
+	while (setdex[name][setKey]) setKey += " ";
+	setdex[name][setKey] = setObj;
+	var dataId = name + " (" + setKey + ")";
+
+	// Single sprite for the copied mon exactly as configured. Unlike roster mons (which show
+	// a pre-mega base sprite that mega-evolves), a copied mega/Ash form should appear as that
+	// form itself — so no data-base-name and no separate base sprite.
+	var pokName = name;
+	if (pokName === "Zygarde-10%") pokName = "Zygarde-10%25";
+	if (pokName.includes("Vivillon")) pokName = "Vivillon";
+	var spriteBase = "https://raw.githubusercontent.com/May8th1995/sprites/master/";
+	var imgHtml = `<img class="trainer-pok right-side" src="${spriteBase}${pokName}.png" data-id="${dataId}" title="[0]${dataId}">`;
+
+	$('.trainer-pok-list-opposing').append(imgHtml);
+	colorCodeUpdateOpposing();
+	updateOppPoksDraggability();
+});
+
 $(document).on('click', '.left-side', function () {
 	var set = $(this).attr('data-id');
 	topPokemonIcon(set, $("#p1mon")[0])
