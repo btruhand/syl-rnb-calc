@@ -2122,7 +2122,6 @@ function colorCodeUpdate(){
 }
 
 function colorCodeUpdatePlayerTop(){
-	if (document.getElementById("cc-sets").hasAttribute("hidden")) return;
 	var speCheck = document.getElementById("cc-spe-border").checked;
 	var ohkoCheck = document.getElementById("cc-ohko-color").checked;
 	if (!speCheck && !ohkoCheck) return;
@@ -2144,7 +2143,6 @@ function colorCodeUpdatePlayerTop(){
 }
 
 function colorCodeUpdateOpposingTop(){
-	if (document.getElementById("cc-sets").hasAttribute("hidden")) return;
 	var speCheck = document.getElementById("cc-spe-border").checked;
 	var ohkoCheck = document.getElementById("cc-ohko-color").checked;
 	var oppCheck = document.getElementById("cc-opp-color").checked;
