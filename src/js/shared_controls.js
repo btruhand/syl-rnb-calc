@@ -1975,7 +1975,7 @@ $(document).on('click', '#copy-player-to-opp', function () {
 	var pokName = name;
 	if (pokName.includes("Vivillon")) pokName = "Vivillon";
 	var spriteBase = "https://raw.githubusercontent.com/May8th1995/sprites/master/";
-	var imgHtml = `<img class="trainer-pok right-side" src="${spriteBase}${encodeURIComponent(pokName)}.png" data-id="${dataId}" title="[0]${dataId}">`;
+	var imgHtml = `<img class="trainer-pok right-side" src="${spriteBase}${encodeURIComponent(pokName)}.png" data-id="${dataId}" data-copied="1" title="[0]${dataId}">`;
 
 	$('.trainer-pok-list-opposing').append(imgHtml);
 	colorCodeUpdateOpposing();
@@ -2581,6 +2581,18 @@ function setOppPoksDraggable(draggable) {
 	}
 }
 
+function setCopiedPoksDraggable(draggable) {
+	var copied = document.querySelectorAll('img.trainer-pok.right-side[data-copied]');
+	for (let mon of copied) {
+		mon.draggable = draggable;
+		if (draggable) {
+			mon.addEventListener("dragstart", dragstart_handler);
+		} else {
+			mon.removeEventListener("dragstart", dragstart_handler);
+		}
+	}
+}
+
 function lockFirstPokInContainer(container) {
 	if (!container) return;
 	var imgs = container.querySelectorAll('img.trainer-pok.right-side');
@@ -2602,6 +2614,11 @@ function updateOppPoksDraggability() {
 	setOppPoksDraggable(false);
 
 	if (!isDoubles) return;
+
+	// Copied mons are user-injected, not part of the trainer roster. Keep them draggable when
+	// team slots are on so the user can rearrange their slot — even in pseudo doubles, where
+	// roster mons stay locked.
+	if (teamSlotsEnabled) setCopiedPoksDraggable(true);
 
 	if (autoPseudoTrue) {
 		var metadata = typeof TRAINER_METADATA !== 'undefined' ? TRAINER_METADATA[window.CURRENT_TRAINER] : null;
