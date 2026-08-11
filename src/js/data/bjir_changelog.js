@@ -96,4 +96,5 @@ const BJIR_CHANGELOG = [
 	new ChangelogLine(1, 8, 3, "Fix: Sync base Pokémon's moves to it's mega forme correctly"),
 	new ChangelogLine(1, 8, 4, "Fix: Keep Pokemon's saved box across team drops and re-imports"),
 	new ChangelogLine(1, 8, 5, "Feature: Keep Pokémon's box ordering across reloads, including sorted mons parked in Team"),
+	new ChangelogLine(1, 8, 6, "Feature: Add a 'Return to box' button"),
 ];
