@@ -1694,6 +1694,7 @@ function get_trainer_names() {
 // The Team and trash dropzones are scratch areas: a mon sitting there on reload goes back to
 // the box it was last filed in, so only these two ids are ever persisted.
 var BOX_CONTAINERS = ['box-poke-list', 'box-poke-list2'];
+var TEAM_CONTAINERS = ['team-poke-list', 'team-slot-2'];
 
 function addBoxed(poke) {
 	if (document.getElementById(`${poke.name}${poke.nameProp}`)) {
@@ -2307,29 +2308,38 @@ function boxMembers(customsets, containerId) {
 }
 
 // Single writer for box placement: records which box each mon belongs to and where in that box,
-// so a drag, a swap with a neighbour and either sort button all persist through the same path.
-// `reorderDom` re-appends the sprites that are physically in the box so what is on screen matches
-// the numbering just written; parked sprites are never moved, only renumbered.
-function writeBoxOrder(orderMembers, reorderDom) {
+// so a drag, a swap with a neighbour, either sort button and the return-to-box button all persist
+// through the same path. `shouldReflow` decides which sprites are re-appended in the new order —
+// a sprite it rejects keeps its place on screen and is only renumbered. Rosters for both boxes are
+// taken before anything moves, so relocating a sprite can't change what the other box counts as
+// parked halfway through.
+function writeBoxOrder(orderMembers, shouldReflow) {
 	if (!localStorage.customsets) return;
 	var customsets = JSON.parse(localStorage.customsets);
-	BOX_CONTAINERS.forEach(function (containerId) {
+	var rosters = BOX_CONTAINERS.map(function (containerId) {
+		return orderMembers(customsets, containerId);
+	});
+	BOX_CONTAINERS.forEach(function (containerId, boxNumber) {
 		var container = document.getElementById(containerId);
 		if (!container) return;
-		orderMembers(customsets, containerId).forEach(function (img, i) {
+		rosters[boxNumber].forEach(function (img, i) {
 			var set = setFromPokeImg(customsets, img);
 			if (set) {
 				set.containerId = containerId;
 				set.boxIndex = i;
 			}
-			if (reorderDom && img.parentNode === container) container.appendChild(img);
+			if (shouldReflow && shouldReflow(img, container)) container.appendChild(img);
 		});
 	});
 	localStorage.customsets = JSON.stringify(customsets);
 }
 
+function alreadyInBox(img, container) {
+	return img.parentNode === container;
+}
+
 function saveBoxOrder() {
-	writeBoxOrder(boxMembers, false);
+	writeBoxOrder(boxMembers);
 }
 
 // Sorting ranks every mon the boxes own, parked ones included, then only reflows the sprites that
@@ -2338,7 +2348,16 @@ function saveBoxOrder() {
 function sortBoxes(compare) {
 	writeBoxOrder(function (customsets, containerId) {
 		return boxMembers(customsets, containerId).sort(compare);
-	}, true);
+	}, alreadyInBox);
+}
+
+// Sends every mon sitting in Team back to the box it belongs to, dropped in at the slot it has
+// been holding, so a team that was pulled out of a sorted box goes back sorted. Mons in the trash
+// are left where they are: the trash is a pending deletion, not a parking spot.
+function returnTeamToBox() {
+	writeBoxOrder(boxMembers, function (img, container) {
+		return alreadyInBox(img, container) || TEAM_CONTAINERS.includes(img.parentNode.id);
+	});
 }
 
 function drop(ev) {
@@ -3066,4 +3085,8 @@ $("#sort-by-name-btn").click(function () {
 	sortBoxes(function (a, b) {
 		return a.dataset.id.localeCompare(b.dataset.id);
 	});
+});
+
+$("#return-team-btn").click(function () {
+	returnTeamToBox();
 });

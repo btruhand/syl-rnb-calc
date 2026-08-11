@@ -1281,7 +1281,8 @@ table.field {
 }
 
 #sort-by-name-btn,
-#sort-by-speed-btn {
+#sort-by-speed-btn,
+#return-team-btn {
     margin-left: 8px;
     padding: 4px 6px;
     font-size: 0.85em;
@@ -1294,8 +1295,23 @@ table.field {
 }
 
 #sort-by-name-btn:hover,
-#sort-by-speed-btn:hover {
+#sort-by-speed-btn:hover,
+#return-team-btn:hover {
     border-color: #444444;
+}
+
+/* Keeps the Team heading centred with its action sitting beside it, rather than crowding the
+   Team/Box legend where the search field needs the room. */
+.box-section-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+}
+
+/* The shared button rule adds its own left margin, which would stack with the gap. */
+.box-section-legend #return-team-btn {
+    margin-left: 0;
 }
 
 #search-inline {
