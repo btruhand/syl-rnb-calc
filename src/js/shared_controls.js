@@ -1691,6 +1691,10 @@ function get_trainer_names() {
 	}
 	return trainer_names
 }
+// The Team and trash dropzones are scratch areas: a mon sitting there on reload goes back to
+// the box it was last filed in, so only these two ids are ever persisted.
+var BOX_CONTAINERS = ['box-poke-list', 'box-poke-list2'];
+
 function addBoxed(poke) {
 	if (document.getElementById(`${poke.name}${poke.nameProp}`)) {
 		//nothing to do it already exist
@@ -1702,7 +1706,6 @@ function addBoxed(poke) {
 	newPoke.src = getSrcImgPokemon(poke);
 	newPoke.dataset.id = `${poke.name} (${poke.nameProp})`
 	newPoke.addEventListener("dragstart", dragstart_handler);
-	var BOX_CONTAINERS = ['box-poke-list', 'box-poke-list2'];
 	var containerId = BOX_CONTAINERS.includes(poke.containerId) ? poke.containerId : 'box-poke-list';
 	document.getElementById(containerId).appendChild(newPoke);
 }
@@ -2263,6 +2266,7 @@ function dragstart_handler(ev) {
 
 function savePokeContainerId(pokeImg, containerId) {
 	if (!localStorage.customsets) return;
+	if (!BOX_CONTAINERS.includes(containerId)) return;
 	var dataId = pokeImg.dataset.id;
 	var parenIdx = dataId.lastIndexOf(" (");
 	var name = dataId.substring(0, parenIdx);

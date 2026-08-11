@@ -374,6 +374,11 @@ function getMegaFormsForBase(baseName) {
 	return result;
 }
 
+function keepBoxOf(previousSet, dexObject) {
+	if (!previousSet || !previousSet.containerId) return dexObject;
+	return Object.assign({}, dexObject, {containerId: previousSet.containerId});
+}
+
 function addToDex(poke) {
 	var dexObject = {};
 	if ($("#randoms").prop("checked")) {
@@ -419,12 +424,16 @@ function addToDex(poke) {
 	if (!customsets[poke.name]) {
 		customsets[poke.name] = {};
 	}
-	customsets[poke.name][poke.nameProp] = dexObject;
+	// Re-importing a set replaces its entry wholesale, so the box the user filed it in has to be
+	// carried over by hand or it silently reverts to box 1 on the next reload.
+	customsets[poke.name][poke.nameProp] = keepBoxOf(customsets[poke.name][poke.nameProp], dexObject);
 	if (poke.name === "Aegislash-Blade") {
 		if (!customsets["Aegislash-Shield"]) {
 			customsets["Aegislash-Shield"] = {};
 		}
-		customsets["Aegislash-Shield"][poke.nameProp] = dexObject;
+		// Shield is boxed as its own sprite, so it keeps its own box rather than Blade's.
+		customsets["Aegislash-Shield"][poke.nameProp] =
+			keepBoxOf(customsets["Aegislash-Shield"][poke.nameProp], dexObject);
 	}
 	var megaForms = getMegaFormsForBase(poke.name);
 	for (var m = 0; m < megaForms.length; m++) {
