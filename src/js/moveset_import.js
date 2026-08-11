@@ -368,9 +368,7 @@ function getMegaFormsForBase(baseName) {
 			} else {
 				formName = baseName + '-Mega';
 			}
-			var megaSpecies = calc.SPECIES[9][formName];
-			var ability = megaSpecies ? megaSpecies.abilities[0] : undefined;
-			result.push({ formName: formName, stone: stone, ability: ability });
+			result.push({ formName: formName, stone: stone });
 		}
 	}
 	return result;
@@ -433,13 +431,14 @@ function addToDex(poke) {
 		var megaInfo = megaForms[m];
 		if (customsets[megaInfo.formName]) {
 			for (var megaSetName in customsets[megaInfo.formName]) {
+				// Ability is left alone: the mega forme's ability is its own, not the base's.
 				customsets[megaInfo.formName][megaSetName].level = dexObject.level;
 				customsets[megaInfo.formName][megaSetName].nature = dexObject.nature;
-				customsets[megaInfo.formName][megaSetName].ivs = dexObject.ivs;
+				// Copy the spread/moves so editing one forme's later doesn't mutate the others.
+				customsets[megaInfo.formName][megaSetName].ivs = dexObject.ivs && Object.assign({}, dexObject.ivs);
+				customsets[megaInfo.formName][megaSetName].evs = dexObject.evs && Object.assign({}, dexObject.evs);
+				customsets[megaInfo.formName][megaSetName].moves = dexObject.moves && dexObject.moves.slice();
 				customsets[megaInfo.formName][megaSetName].item = megaInfo.stone;
-				if (megaInfo.ability) {
-					customsets[megaInfo.formName][megaSetName].ability = megaInfo.ability;
-				}
 			}
 		}
 	}
