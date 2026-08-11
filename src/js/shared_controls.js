@@ -970,6 +970,27 @@ function correctHiddenPower(pokemon) {
 	return pokemon;
 }
 
+// A pre-mega/pre-transform sprite calcs as its base forme, but the base forme's in-game
+// ability is set-specific and is not the dex's first ability: Winstrate Vicky's Medicham
+// holds Inner Focus until it mega-evolves, so taking Pure Power off the dex entry doubles
+// its Attack and makes the base sprite hit like the mega. MEGA_BASE_ABILITIES is the source
+// of truth; an unlisted mega falls back to the base species' dex ability, while Ash-Greninja
+// has no distinct pre-transform ability (Battle Bond) and keeps the set's.
+function baseFormeAbility(baseName, setName, formeName, fallbackAbility) {
+	var trainerName = setName || "";
+	if (trainerName.includes("Trainer Rival")) trainerName = "Pokemon Trainer May";
+	var mbaKey = Object.keys(MEGA_BASE_ABILITIES).find(function (k) {
+		return trainerName.includes(k);
+	}) || trainerName;
+	var mba = MEGA_BASE_ABILITIES[mbaKey] && MEGA_BASE_ABILITIES[mbaKey][baseName];
+	if (mba) return mba;
+	if (formeName && formeName.indexOf("-Mega") !== -1) {
+		var dexAbility = pokedex[baseName] && pokedex[baseName].abilities && pokedex[baseName].abilities[0];
+		if (dexAbility) return dexAbility;
+	}
+	return fallbackAbility || "";
+}
+
 function createPokemon(pokeInfo, nameOverride, critSource) {
 	if (typeof pokeInfo === "string") { // in this case, pokeInfo is the id of an individual setOptions value whose moveset's tier matches the selected tier(s)
 		var name = pokeInfo.substring(0, pokeInfo.indexOf(" ("));
@@ -1012,7 +1033,7 @@ function createPokemon(pokeInfo, nameOverride, critSource) {
 
 		return new calc.Pokemon(gen, nameOverride || name, {
 			level: set.level,
-			ability: nameOverride ? (pokedex[nameOverride]?.abilities?.[0] || set.ability) : set.ability,
+			ability: nameOverride ? baseFormeAbility(nameOverride, setName, name, set.ability) : set.ability,
 			abilityOn: true,
 			item: set.item && typeof set.item !== "undefined" && (set.item === "Eviolite" || set.item.indexOf("ite") < 0) ? set.item : "",
 			nature: set.nature,
@@ -1898,14 +1919,8 @@ $(document).on('click', '.right-side', function () {
 			calcStats(pokeObj);
 		}
 		var trainerName = set.substring(set.indexOf("(") + 1, set.lastIndexOf(")"));
-		if (trainerName.includes("Trainer Rival")) { trainerName = "Pokemon Trainer May"; }
-		var mbaKey = Object.keys(MEGA_BASE_ABILITIES).find(k => trainerName.includes(k)) || trainerName;
-		var baseAbility = (MEGA_BASE_ABILITIES[mbaKey] && MEGA_BASE_ABILITIES[mbaKey][baseName])
-			|| (basePokemon && basePokemon.ab)
-			// Ash-Greninja's base form shares the set's ability (Battle Bond), unlike megas
-			// which carry a distinct pre-mega ability — keep the already-loaded set ability.
-			|| pokeObj.find(".ability").val()
-			|| "";
+		var baseAbility = baseFormeAbility(baseName, trainerName, set.split(" (")[0],
+			pokeObj.find(".ability").val());
 		pokeObj.find("select.forme").val(baseName);
 		pokeObj.find(".ability").val(baseAbility).keyup();
 	}
