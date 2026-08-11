@@ -455,6 +455,7 @@ function addToDex(poke) {
 }
 
 function updateDex(customsets) {
+	var boxedPokes = [];
 	for (var pokemon in customsets) {
 		for (var moveset in customsets[pokemon]) {
 			if (!SETDEX_SV[pokemon]) SETDEX_SV[pokemon] = {};
@@ -475,10 +476,20 @@ function updateDex(customsets) {
 			SETDEX_GSC[pokemon][moveset] = customsets[pokemon][moveset];
 			if (!SETDEX_RBY[pokemon]) SETDEX_RBY[pokemon] = {};
 			SETDEX_RBY[pokemon][moveset] = customsets[pokemon][moveset];
-			var poke = {name: pokemon, nameProp: moveset, containerId: customsets[pokemon][moveset].containerId};
-			addBoxed(poke);
+			boxedPokes.push({
+				name: pokemon,
+				nameProp: moveset,
+				containerId: customsets[pokemon][moveset].containerId,
+				boxIndex: customsets[pokemon][moveset].boxIndex
+			});
 		}
 	}
+	// Boxing happens after the whole map is read: sprites are appended in saved box order rather
+	// than in the order the sets happen to be keyed under.
+	boxedPokes.sort(function (a, b) {
+		return boxIndexOf(a) - boxIndexOf(b);
+	});
+	boxedPokes.forEach(addBoxed);
 	localStorage.customsets = JSON.stringify(customsets);
 }
 
@@ -513,6 +524,9 @@ function addSets(pokes, name) {
 		}
 	}
 	if (addedpokes > 0) {
+		// Freshly imported sets land at the end of their box; index them now so their position is
+		// pinned rather than inherited from key order.
+		saveBoxOrder();
 		$(allPokemon("#importedSetsOptions")).css("display", "inline");
 	} else {
 		alert("No sets imported, please check your syntax and try again");

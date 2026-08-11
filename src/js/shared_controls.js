@@ -1710,6 +1710,12 @@ function addBoxed(poke) {
 	document.getElementById(containerId).appendChild(newPoke);
 }
 
+// Sets saved before boxIndex existed sort last, which leaves them in the insertion order they
+// used to render in. A single drag or sort backfills the whole box, so the mix is short-lived.
+function boxIndexOf(poke) {
+	return typeof poke.boxIndex === 'number' ? poke.boxIndex : Number.MAX_SAFE_INTEGER;
+}
+
 function getSrcImgPokemon(poke) {
 	//edge case
 	if (!poke) {
@@ -2264,18 +2270,75 @@ function dragstart_handler(ev) {
 	pokeDragged = ev.target;
 }
 
-function savePokeContainerId(pokeImg, containerId) {
-	if (!localStorage.customsets) return;
-	if (!BOX_CONTAINERS.includes(containerId)) return;
+function setFromPokeImg(customsets, pokeImg) {
 	var dataId = pokeImg.dataset.id;
 	var parenIdx = dataId.lastIndexOf(" (");
 	var name = dataId.substring(0, parenIdx);
 	var nameProp = dataId.substring(parenIdx + 2, dataId.length - 1);
+	return customsets[name] && customsets[name][nameProp];
+}
+
+function storedBoxOf(customsets, pokeImg) {
+	var parentId = pokeImg.parentNode && pokeImg.parentNode.id;
+	if (BOX_CONTAINERS.includes(parentId)) return parentId;
+	var set = setFromPokeImg(customsets, pokeImg);
+	return set && BOX_CONTAINERS.includes(set.containerId) ? set.containerId : BOX_CONTAINERS[0];
+}
+
+// Full membership of a box: the sprites sitting in it, plus the mons parked in Team or the trash
+// that still belong to it, slotted back in at their saved index. Everything that belongs to the
+// box takes part in the numbering, so a parked mon still has a place to come back to.
+function boxMembers(customsets, containerId) {
+	var all = Array.from(document.querySelectorAll(".trainer-pok.left-side"));
+	var members = all.filter(function (img) {
+		return img.parentNode.id === containerId;
+	});
+	var parked = all.filter(function (img) {
+		return !BOX_CONTAINERS.includes(img.parentNode.id) && storedBoxOf(customsets, img) === containerId;
+	});
+	parked.sort(function (a, b) {
+		return boxIndexOf(setFromPokeImg(customsets, a) || {}) - boxIndexOf(setFromPokeImg(customsets, b) || {});
+	});
+	parked.forEach(function (img) {
+		var slot = boxIndexOf(setFromPokeImg(customsets, img) || {});
+		members.splice(Math.min(slot, members.length), 0, img);
+	});
+	return members;
+}
+
+// Single writer for box placement: records which box each mon belongs to and where in that box,
+// so a drag, a swap with a neighbour and either sort button all persist through the same path.
+// `reorderDom` re-appends the sprites that are physically in the box so what is on screen matches
+// the numbering just written; parked sprites are never moved, only renumbered.
+function writeBoxOrder(orderMembers, reorderDom) {
+	if (!localStorage.customsets) return;
 	var customsets = JSON.parse(localStorage.customsets);
-	if (customsets[name] && customsets[name][nameProp]) {
-		customsets[name][nameProp].containerId = containerId;
-		localStorage.customsets = JSON.stringify(customsets);
-	}
+	BOX_CONTAINERS.forEach(function (containerId) {
+		var container = document.getElementById(containerId);
+		if (!container) return;
+		orderMembers(customsets, containerId).forEach(function (img, i) {
+			var set = setFromPokeImg(customsets, img);
+			if (set) {
+				set.containerId = containerId;
+				set.boxIndex = i;
+			}
+			if (reorderDom && img.parentNode === container) container.appendChild(img);
+		});
+	});
+	localStorage.customsets = JSON.stringify(customsets);
+}
+
+function saveBoxOrder() {
+	writeBoxOrder(boxMembers, false);
+}
+
+// Sorting ranks every mon the boxes own, parked ones included, then only reflows the sprites that
+// are actually in a box. A mon left in Team keeps its spot on screen but takes its sorted place on
+// the next reload, as if it had been sorted along with the rest.
+function sortBoxes(compare) {
+	writeBoxOrder(function (customsets, containerId) {
+		return boxMembers(customsets, containerId).sort(compare);
+	}, true);
 }
 
 function drop(ev) {
@@ -2301,10 +2364,13 @@ function drop(ev) {
 		return;
 	}
 
+	// Dropping into Team or the trash takes a mon out of its box without disturbing the mons left
+	// behind, so only drops that land in a box are worth re-saving.
+	var destination = null;
 	if (ev.target.classList.contains("dropzone")) {
 		pokeDragged.parentNode.removeChild(pokeDragged);
 		ev.target.appendChild(pokeDragged);
-		savePokeContainerId(pokeDragged, ev.target.id);
+		destination = ev.target.id;
 	}
 	// if it's a pokemon
 	else if(ev.target.classList.contains("left-side")) {
@@ -2320,9 +2386,10 @@ function drop(ev) {
 		else{
 			let prev1 = ev.target.previousSibling || ev.target;
 			prev1.after(pokeDragged);
-			savePokeContainerId(pokeDragged, ev.target.parentNode.id);
 		}
+		destination = ev.target.parentNode.id;
 	}
+	if (BOX_CONTAINERS.includes(destination)) saveBoxOrder();
 	ev.target.classList.remove('over');
 }
 
@@ -2987,44 +3054,16 @@ $("#sort-by-speed-btn").click(function () {
 	function getSpe(img) {
 		try { return createPokemon(img.dataset.id).stats.spe; } catch(e) { return -1; }
 	}
-	["#box-poke-list", "#box-poke-list2"].forEach(function (selector) {
-		var container = document.querySelector(selector);
-		if (!container) return;
-		var imgs = Array.from(container.querySelectorAll(".trainer-pok.left-side"));
-		imgs.sort(function (a, b) {
-			var aSpd = getSpe(a);
-			var bSpd = getSpe(b);
-			if (bSpd !== aSpd) return bSpd - aSpd;
-			return a.dataset.id.localeCompare(b.dataset.id);
-		});
-		imgs.forEach(function (img) { container.appendChild(img); });
+	sortBoxes(function (a, b) {
+		var aSpd = getSpe(a);
+		var bSpd = getSpe(b);
+		if (bSpd !== aSpd) return bSpd - aSpd;
+		return a.dataset.id.localeCompare(b.dataset.id);
 	});
 });
 
 $("#sort-by-name-btn").click(function () {
-	["#box-poke-list", "#box-poke-list2"].forEach(function (selector) {
-		var container = document.querySelector(selector);
-		if (!container) return;
-		var imgs = Array.from(container.querySelectorAll(".trainer-pok.left-side"));
-		imgs.sort(function (a, b) {
-			return a.dataset.id.localeCompare(b.dataset.id);
-		});
-		imgs.forEach(function (img) { container.appendChild(img); });
+	sortBoxes(function (a, b) {
+		return a.dataset.id.localeCompare(b.dataset.id);
 	});
-
-	if (!localStorage.customsets) return;
-	var customsets = JSON.parse(localStorage.customsets);
-	var allImgs = Array.from(document.querySelectorAll(".trainer-pok.left-side"));
-	var newCustomsets = {};
-	allImgs.forEach(function (img) {
-		var dataId = img.dataset.id;
-		var parenIdx = dataId.lastIndexOf(" (");
-		var name = dataId.substring(0, parenIdx);
-		var nameProp = dataId.substring(parenIdx + 2, dataId.length - 1);
-		if (customsets[name] && customsets[name][nameProp]) {
-			if (!newCustomsets[name]) newCustomsets[name] = {};
-			newCustomsets[name][nameProp] = customsets[name][nameProp];
-		}
-	});
-	localStorage.customsets = JSON.stringify(newCustomsets);
 });
