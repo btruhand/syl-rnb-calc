@@ -92,4 +92,8 @@ const BJIR_CHANGELOG = [
 	new ChangelogLine(1, 7, 3,"Show color coding and speed border if turned on without having to open color coding options"),
 	new ChangelogLine(1, 8, 0,"Add 'Copy your mon to enemy team' functionality"),
 	new ChangelogLine(1, 8, 1,"Fix Zygarde-10% top sprite not shown; Allow copied pokemon to be draggable in doubles when team slots option is on"),
+	new ChangelogLine(1, 8, 2, "Fix: Pre-mega enemy Pokémon not calculating damage using specific base forme ability"),
+	new ChangelogLine(1, 8, 3, "Fix: Sync base Pokémon's moves to it's mega forme correctly"),
+	new ChangelogLine(1, 8, 4, "Fix: Keep Pokemon's saved box across team drops and re-imports"),
+	new ChangelogLine(1, 8, 5, "Feature: Keep Pokémon's box ordering across reloads, including sorted mons parked in Team"),
 ];
