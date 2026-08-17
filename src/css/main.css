@@ -1300,8 +1300,6 @@ table.field {
     border-color: #444444;
 }
 
-/* Keeps the Team heading centred with its action sitting beside it, rather than crowding the
-   Team/Box legend where the search field needs the room. */
 .box-section-legend {
     display: flex;
     align-items: center;
@@ -1309,8 +1307,17 @@ table.field {
     gap: 16px;
 }
 
-/* The shared button rule adds its own left margin, which would stack with the gap. */
-.box-section-legend #return-team-btn {
+/* Sits below the team slots instead of beside the Team heading, where it was close enough to the
+   first row of sprites to catch stray clicks. The top margin keeps that distance from the sprites,
+   and the Team/Box legend stays free for the search field. */
+.team-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+/* The shared button rule adds its own left margin, which would offset the right alignment. */
+.team-actions #return-team-btn {
     margin-left: 0;
 }
 
