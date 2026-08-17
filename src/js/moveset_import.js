@@ -374,9 +374,15 @@ function getMegaFormsForBase(baseName) {
 	return result;
 }
 
+// A set's place in the boxes is which box holds it and where in that box it sits, so both have to
+// travel together. Carrying the box over without the slot leaves the mon indexless, which reads as
+// "sort last" and drops it at the end of its box.
 function keepBoxOf(previousSet, dexObject) {
-	if (!previousSet || !previousSet.containerId) return dexObject;
-	return Object.assign({}, dexObject, {containerId: previousSet.containerId});
+	if (!previousSet) return dexObject;
+	var kept = Object.assign({}, dexObject);
+	if (previousSet.containerId !== undefined) kept.containerId = previousSet.containerId;
+	if (previousSet.boxIndex !== undefined) kept.boxIndex = previousSet.boxIndex;
+	return kept;
 }
 
 function addToDex(poke) {
@@ -424,14 +430,14 @@ function addToDex(poke) {
 	if (!customsets[poke.name]) {
 		customsets[poke.name] = {};
 	}
-	// Re-importing a set replaces its entry wholesale, so the box the user filed it in has to be
-	// carried over by hand or it silently reverts to box 1 on the next reload.
+	// Re-importing a set replaces its entry wholesale, so the place the user filed it in has to be
+	// carried over by hand or it silently reverts to the end of box 1 on the next reload.
 	customsets[poke.name][poke.nameProp] = keepBoxOf(customsets[poke.name][poke.nameProp], dexObject);
 	if (poke.name === "Aegislash-Blade") {
 		if (!customsets["Aegislash-Shield"]) {
 			customsets["Aegislash-Shield"] = {};
 		}
-		// Shield is boxed as its own sprite, so it keeps its own box rather than Blade's.
+		// Shield is boxed as its own sprite, so it keeps its own place rather than Blade's.
 		customsets["Aegislash-Shield"][poke.nameProp] =
 			keepBoxOf(customsets["Aegislash-Shield"][poke.nameProp], dexObject);
 	}
