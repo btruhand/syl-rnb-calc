@@ -97,4 +97,5 @@ const BJIR_CHANGELOG = [
 	new ChangelogLine(1, 8, 4, "Fix: Keep Pokemon's saved box across team drops and re-imports"),
 	new ChangelogLine(1, 8, 5, "Feature: Keep Pokémon's box ordering across reloads, including sorted mons parked in Team"),
 	new ChangelogLine(1, 8, 6, "Feature: Add a 'Return to box' button"),
+	new ChangelogLine(1, 8, 7, "Fix: Re-imports for existing Pokémon no longer loses positioning information; Fix: Move the 'Return to box' button below the team slots to reduce chances of misclicks"),
 ];
