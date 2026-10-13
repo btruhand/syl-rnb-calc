@@ -141,7 +141,13 @@ function performCalculations() {
 	p2.maxDamages = [];
 	p1info.find(".sp .totalMod").text(p1.stats.spe);
 	p2info.find(".sp .totalMod").text(p2.stats.spe);
-	var fastestSide = p1.stats.spe > p2.stats.spe ? 0 : 1;
+	var fastestSide = 'tie';
+	if (p1.stats.spe !== p2.stats.spe) {
+		var p1MovesFirst = p1field.isTrickRoom
+			? p1.stats.spe < p2.stats.spe
+			: p1.stats.spe > p2.stats.spe;
+		fastestSide = p1MovesFirst ? 0 : 1;
+	}
 
 	var result, maxDamage;
 	var bestResult;
@@ -195,7 +201,7 @@ function performCalculations() {
 	var runAIPercentageCode = !($("#disableAiMovePercentage").is(":checked"));
 
 	if (runAIPercentageCode) {
-		var moveRates = calc.generateMoveDist(damageResults, fastestSide, aiOptions);
+		var moveRates = calc.generateMoveDist(damageResults, aiOptions);
 
 		for (var i = 0; i < moveRates.length; i++) {
 			$("#resultMoveRateR" + (i + 1)).text((moveRates[i] * 100).toFixed(2) + "%");
@@ -552,13 +558,14 @@ $(document).ready(function () {
 			This prevents like 8 performCalculations out of 8 that were useless
 			without causing bugs (so far)
 		*/
-		if (window.NO_CALC) {
-			return;
-		}
 		if (document.getElementById("cc-auto-refr").checked) {
 			window.refreshColorCode();
 		}
-		
+
+		if (window.NO_CALC) {
+			return;
+		}
+				
 		performCalculations();
 	});
 

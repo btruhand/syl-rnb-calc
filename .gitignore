@@ -12,3 +12,4 @@ scripts/__pycache__
 
 # intermediary data for double slots conversion
 scripts/data/trainerMetadata.json
+.scratch/
